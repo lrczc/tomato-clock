@@ -1,6 +1,7 @@
 package com.example.myapp;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -11,6 +12,8 @@ import android.view.MenuItem;
  * Created by czc on 2014/8/21.
  */
 public class TodayActivity extends ActionBarActivity {
+
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +30,20 @@ public class TodayActivity extends ActionBarActivity {
     }
 
     private void addItem() {
+        new AddItemDialog.Builder(this)
+                .setTitle("aaa")
+                .setPositiveButton("确定",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AddItemDialog addDialog = (AddItemDialog) dialog;
+                        String content = addDialog.getContent();
+                        if (content != null && content != "") {
 
+                        }
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override
