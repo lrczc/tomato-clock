@@ -4,7 +4,8 @@
     android:versionCode="1"
     android:versionName="1.0">
 
-    <uses-sdk android:minSdkVersion="19" />
+    <uses-sdk android:minSdkVersion="8"
+        android:targetSdkVersion="15"/>
     <application
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher">
@@ -16,5 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".TodayActivity"
+            android:label="今日任务" />
     </application>
 </manifest>

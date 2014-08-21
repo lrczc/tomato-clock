@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MyActivity</string>
+    <string name="app_name">番茄钟</string>
+    <string name="plan">计划</string>
+    <string name="today">今日事件</string>
+    <string name="record">记录</string>
+    <string name="add">添加</string>
 </resources>
