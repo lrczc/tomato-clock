@@ -31,19 +31,19 @@ public class EventListAdapter extends BaseAdapter {
     }
 
     public void addEventsFirst(List<Event> events) {
-        //mEventList.addFirst();
+        mEventList.addAll(0, events);
     }
 
     public void addEventsLast(List<Event> events) {
-
+        mEventList.addAll(events);
     }
 
     public void addEventFirst(Event event) {
-
+        mEventList.addFirst(event);
     }
 
     public void addEventLast(Event event) {
-
+        mEventList.addLast(event);
     }
 
     public List<Event> getEventList() {
@@ -87,6 +87,8 @@ public class EventListAdapter extends BaseAdapter {
 
         private ViewHolder(View view) {
             view.setTag(this);
+            title = (TextView) view.findViewById(R.id.title);
+            subtitle = (TextView) view.findViewById(R.id.subtitle);
         }
 
         public static ViewHolder getFromView(View view) {

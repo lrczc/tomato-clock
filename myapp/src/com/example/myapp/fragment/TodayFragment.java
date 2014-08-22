@@ -4,26 +4,27 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.myapp.AddItemDialog;
 import com.example.myapp.R;
 import com.example.myapp.adapter.EventListAdapter;
 import com.example.myapp.model.Event;
 
-import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by czc on 2014/8/21.
  */
 public class TodayFragment extends Fragment {
+
+    private String TAG = "today event";
 
     private Context mContext;
 
@@ -31,7 +32,11 @@ public class TodayFragment extends Fragment {
 
     private EventListAdapter mEventAdapter;
 
+    private List<Event> mEventList = new ArrayList<Event>();
+
     private TextView mTvAdd;
+
+    private AddDialogFragment dialog;
 
     public TodayFragment(Context context) {
         mContext = context;
@@ -41,6 +46,7 @@ public class TodayFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mEventAdapter = new EventListAdapter(getLayoutInflater(savedInstanceState));
+        mEventAdapter.changeEvents(mEventList);
     }
 
     @Override
@@ -65,31 +71,32 @@ public class TodayFragment extends Fragment {
 
 
     private void addItem() {
-        new AddItemDialog.Builder(mContext)
-                .setTitle("aaa")
-                .setPositiveButton("确定",new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        AddItemDialog addDialog = (AddItemDialog) dialog;
-                        String content = addDialog.getContent();
-                        if (content != null && content != "") {
-                            Event event = new Event();
-                            event.setEventName(content);
-                            mEventAdapter.addEventLast(event);
-                        } else {
-                            new AlertDialog.Builder(mContext)
-                                    .setMessage("添加失败")
-                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    })
-                                    .create()
-                                    .show();
-                        }
-                    }
-                })
-                .create()
-                .show();
+        dialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
+            @Override
+            public void onDialogPositiveClick(AddDialogFragment dialog) {
+                Event event = new Event();
+                if (dialog.getContent() != null) {
+                    event.setEventName(dialog.getContent());
+                    mEventAdapter.addEventLast(event);
+                } else {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle(getString(R.string.error_info))
+                            .setMessage(getString(R.string.add_failed))
+                            .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .create()
+                            .show();
+                }
+            }
+
+            @Override
+            public void onDialogNegativeClick(AddDialogFragment dialog) {
+            }
+        });
+        dialog.show(getFragmentManager(), TAG);
     }
+
 }

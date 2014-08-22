@@ -11,6 +11,13 @@ public class Event {
     private int time;
     private SoundType sound;
 
+    public Event() {
+        eventID = 0;
+        eventName = null;
+        time = 0;
+        sound = SoundType.dingding;
+    }
+
     public long getEventID() {
         return eventID;
     }
