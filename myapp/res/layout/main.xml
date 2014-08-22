@@ -2,47 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
-    <AnalogClock
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/analog_clock"/>
+    android:orientation="vertical">
 
-    <DigitalClock
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14pt"/>
+    <FrameLayout
+        android:id="@+id/tab_content"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:background="#fff9e671" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <RadioGroup
+        android:id="@+id/tabs_rg"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="@string/plan"
-            android:id="@+id/btn_plan"/>
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+
+        <RadioButton
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp"
+            android:id="@+id/tab_today"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:button="@null"
+            android:checked="true"
+            android:drawableTop="@android:drawable/star_big_off"
+            android:gravity="center"
+            android:singleLine="true"
             android:text="@string/today"
-            android:id="@+id/btn_today"/>
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:textColor="#ffffffff"
+            android:textSize="13sp"
+            android:background="#ffdd4b25"/>
+
+        <RadioButton
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp"
+            android:id="@+id/tab_play"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:button="@null"
+            android:drawableTop="@android:drawable/star_big_off"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/plan"
+            android:textColor="#ffffffff"
+            android:textSize="13sp"
+            android:background="#ffdd4b25"/>
+
+        <RadioButton
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp"
+            android:id="@+id/tab_record"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:button="@null"
+            android:drawableTop="@android:drawable/star_big_off"
+            android:gravity="center"
+            android:singleLine="true"
             android:text="@string/record"
-            android:id="@+id/btn_record"/>
+            android:textColor="#ffffffff"
+            android:textSize="13sp"
+            android:background="#ffdd4b25"/>
 
-    </LinearLayout>
-
-</LinearLayout>  
+    </RadioGroup>
+</LinearLayout>
