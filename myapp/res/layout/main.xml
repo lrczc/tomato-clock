@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1.0"
-        android:background="#fff9e671" />
+        android:background="@color/main_color" />
 
     <RadioGroup
         android:id="@+id/tabs_rg"
@@ -25,15 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:button="@null"
-            android:checked="true"
-            android:drawableTop="@android:drawable/star_big_off"
-            android:gravity="center"
-            android:singleLine="true"
             android:text="@string/today"
-            android:textColor="#ffffffff"
-            android:textSize="13sp"
-            android:background="#ffdd4b25"/>
+            style="@style/radio_style"
+            android:drawableTop="@android:drawable/star_big_off"/>
 
         <RadioButton
             android:paddingTop="7dp"
@@ -42,14 +36,9 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:button="@null"
-            android:drawableTop="@android:drawable/star_big_off"
-            android:gravity="center"
-            android:singleLine="true"
             android:text="@string/plan"
-            android:textColor="#ffffffff"
-            android:textSize="13sp"
-            android:background="#ffdd4b25"/>
+            style="@style/radio_style"
+            android:drawableTop="@android:drawable/star_big_off"/>
 
         <RadioButton
             android:paddingTop="7dp"
@@ -58,14 +47,9 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:button="@null"
+            style="@style/radio_style"
             android:drawableTop="@android:drawable/star_big_off"
-            android:gravity="center"
-            android:singleLine="true"
-            android:text="@string/record"
-            android:textColor="#ffffffff"
-            android:textSize="13sp"
-            android:background="#ffdd4b25"/>
+            android:text="@string/record"/>
 
     </RadioGroup>
 </LinearLayout>

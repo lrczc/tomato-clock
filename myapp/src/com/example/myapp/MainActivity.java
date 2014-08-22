@@ -31,6 +31,8 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_setting:
+                return true;
             default:
                 return super.onMenuItemSelected(featureId, item);
         }

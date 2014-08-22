@@ -1,5 +1,6 @@
 package com.example.myapp;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -171,16 +172,16 @@ public class AddItemDialog extends Dialog {
          * Create the custom dialog
          */
         public AddItemDialog create() {
+
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final AddItemDialog dialog = new AddItemDialog(context,
-                    R.style.Dialog);
+            final AddItemDialog dialog = new AddItemDialog(context, R.style.Dialog);
             View layout = inflater.inflate(R.layout.add_item_dialog, null);
             dialog.addContentView(layout, new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-// set the dialog title
+
             ((TextView) layout.findViewById(R.id.title)).setText(title);
-// set the confirm button
+
             if (positiveButtonText != null) {
                 ((Button) layout.findViewById(R.id.dialog_button_ok))
                         .setText(positiveButtonText);
@@ -220,6 +221,13 @@ public class AddItemDialog extends Dialog {
             }
             dialog.setContentView(layout);
             return dialog;
+        }
+
+        public AddItemDialog show() {
+            AddItemDialog dialog = create();
+            dialog.show();
+            return dialog;
+
         }
     }
 }

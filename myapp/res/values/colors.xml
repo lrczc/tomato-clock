@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_color">#fff9e671</color>
+    <color name="main_text_color">#ffffffff</color>
+    <color name="second_color">#ffdd4b25</color>
+    <color name="green">#ffc7d692</color>
+    <color name="gray">#ffaaa7aa</color>
+    <color name="actionbar_text">#ffffffff</color>
+</resources>

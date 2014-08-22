@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Dialog" parent="android:style/Theme.Dialog">
         <item name="android:windowBackground">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -14,6 +15,46 @@
     <style name="DialogText.Title">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- action bar tab text -->
+    <style name="TabTextStyle" parent="android:Widget.ActionBar.TabText">
+        <item name="android:textColor">@color/actionbar_text</item>
+    </style>
+
+    <!-- action bar title text -->
+    <style name="TitleTextStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/actionbar_text</item>
+    </style>
+
+    <!-- general styles for the action bar -->
+    <style name="MyActionBar" parent="android:Widget.ActionBar">
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:background">@color/main_color</item>
+        <item name="android:backgroundStacked">@color/green</item>
+        <item name="android:backgroundSplit">@color/gray</item>
+    </style>
+
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme" parent="android:Theme.Light">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarTabTextStyle">@style/TabTextStyle</item>
+        <item name="android:actionMenuTextColor">@color/actionbar_text</item>
+    </style>
+
+    <style name="radio_style" parent="android:TextAppearance">
+        <item name="android:fontFamily">微软雅黑</item>
+        <item name="android:button">@null</item>
+        <item name="android:checked">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:background">@color/second_color</item>
+    </style>
+
+    <style name="main_text_style" parent="android:TextAppearance">
+        <item name="android:fontFamily">微软雅黑</item>
     </style>
 
 </resources>
