@@ -50,6 +50,11 @@ public class EventListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void deleteEvent(int position) {
+        mEventList.remove(position);
+        notifyDataSetChanged();
+    }
+
     public List<Event> getEventList() {
         return mEventList;
     }

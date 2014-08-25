@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/21.
  */
-public class TodayFragment extends Fragment {
+public class TodayFragment extends Fragment implements ListView.OnItemLongClickListener, ListView.OnItemClickListener {
 
     private String EVENT_COUNT = "50";
 
@@ -67,7 +68,8 @@ public class TodayFragment extends Fragment {
     }
 
     private void loadlist() {
-        new LoadTask(mDb, EVENT_COUNT, mEventAdapter).execute();
+        LoadTask mLoadTask = new LoadTask(mDb, EVENT_COUNT, mEventAdapter);
+        mLoadTask.execute();
     }
 
     @Override
@@ -76,6 +78,8 @@ public class TodayFragment extends Fragment {
         mLvEventList = (ListView) view.findViewById(R.id.event_list);
         mLvEventList.setVisibility(View.VISIBLE);
         mLvEventList.setAdapter(mEventAdapter);
+        mLvEventList.setOnItemLongClickListener(this);
+        mLvEventList.setOnItemClickListener(this);
         mTvAdd = (TextView) view.findViewById(R.id.add_item);
         mTvAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,9 +95,9 @@ public class TodayFragment extends Fragment {
         dialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
             @Override
             public void onDialogPositiveClick(AddDialogFragment dialog) {
-                Event event = new Event();
+                Event event;
                 if (dialog.getContent() != null) {
-                    event.setEventName(dialog.getContent());
+                    event = new Event(dialog.getContent(), System.currentTimeMillis());
                     mEventAdapter.addEventLast(event);
                     new AddEventTask(mDb).execute(event);
                 } else {
@@ -117,6 +121,42 @@ public class TodayFragment extends Fragment {
         dialog.show(getFragmentManager(), TAG);
     }
 
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.delete_confirm)
+                .setMessage(R.string.if_delete)
+                .setPositiveButton(R.string.confirm,new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteEventTask(mDb).execute(mEventAdapter.getItem(position));
+                        mEventAdapter.deleteEvent(position);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+        return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        dialog = new AddDialogFragment(getString(R.id.add_item), new AddDialogFragment.AddDialogListener() {
+            @Override
+            public void onDialogPositiveClick(AddDialogFragment dialog) {
+
+            }
+
+            @Override
+            public void onDialogNegativeClick(AddDialogFragment dialog) {
+
+            }
+        });
+    }
+
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {
 
         private Database mDb;
@@ -127,22 +167,6 @@ public class TodayFragment extends Fragment {
             this.mDb = mDb;
             this.count = count;
             this.mEventAdapter = mEventAdapter;
-        }
-
-        public Database getmDb() {
-            return mDb;
-        }
-
-        public void setmDb(Database mDb) {
-            this.mDb = mDb;
-        }
-
-        public String getCount() {
-            return count;
-        }
-
-        public void setCount(String count) {
-            this.count = count;
         }
 
         @Override
@@ -158,7 +182,6 @@ public class TodayFragment extends Fragment {
     }
 
     static class AddEventTask extends AsyncTask<Event, Void, Void> {
-
         private Database mDb;
 
         AddEventTask(Database mDb) {
@@ -169,11 +192,45 @@ public class TodayFragment extends Fragment {
         protected Void doInBackground(Event... params) {
             int count = params.length;
             for (int i=0; i<count; i++) {
-                mDb.insertEvent(params[i]);
+                params[i].setEventID(mDb.insertEvent(params[i]));
             }
             return null;
         }
-
-
     }
+
+    static class DeleteEventTask extends AsyncTask<Event, Void, Void> {
+        private Database mDb;
+
+        DeleteEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                mDb.deleteEvent(params[i]);
+            }
+            return null;
+        }
+    }
+
+    static class UpdateEventTask extends AsyncTask<Event, Void, Void> {
+
+        private Database mDb;
+
+        UpdateEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                mDb.updateEvent(params[i]);
+            }
+            return null;
+        }
+    }
+
 }

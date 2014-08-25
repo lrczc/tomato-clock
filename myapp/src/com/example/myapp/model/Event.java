@@ -11,6 +11,7 @@ public class Event {
     private String eventName;
     private int time;
     private int sound;
+    private long planTime;
     private long createTime;
 
     public Event() {
@@ -18,7 +19,13 @@ public class Event {
         eventName = null;
         time = 0;
         sound = 0;
+        planTime = System.currentTimeMillis();
         createTime = System.currentTimeMillis();
+    }
+
+    public Event(String eventName, long planTime) {
+        this.eventName = eventName;
+        this.planTime = planTime;
     }
 
     public long getEventID() {
@@ -59,5 +66,13 @@ public class Event {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public long getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(long planTime) {
+        this.planTime = planTime;
     }
 }

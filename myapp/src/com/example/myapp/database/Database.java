@@ -4,20 +4,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.format.DateFormat;
 
 import com.example.myapp.model.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
  * Created by shizhao.czc on 2014/8/25.
  */
 public class Database {
+
     private SQLiteOpenHelper mOpenHelper;
 
     public Database(SQLiteOpenHelper mOpenHelper) {
@@ -34,13 +33,15 @@ public class Database {
 
 
     public List<Event> getTodayEvent(String count) {
-        String TABLE_NAME = EventColumn.class.getSimpleName();
+        String TABLE_NAME = EventColumns.class.getSimpleName();
         String[] eventColumns = new String[] {
-                EventColumn._ID, EventColumn.EVENT_NAME, EventColumn.TIME, EventColumn.SOUND, EventColumn.CREATE_TIME
+                EventColumns._ID, EventColumns.EVENT_NAME, EventColumns.TIME, EventColumns.SOUND, EventColumns.PLAN_TIME, EventColumns.CREATE_TIME
         };
-        Date today =new Date(System.currentTimeMillis()/86400000*86400000-(23-Calendar.ZONE_OFFSET)*3600000);
-        String selection = EventColumn.CREATE_TIME + ">=" + today.getTime();
-        String orderBy = EventColumn.CREATE_TIME;
+        long today = System.currentTimeMillis()/86400000*86400000-(23-Calendar.ZONE_OFFSET)*3600000;
+        long tomorrow = System.currentTimeMillis()/86400000*86400000+(1+Calendar.ZONE_OFFSET)*3600000;
+        //String selection = EventColumns.PLAN_TIME + " >= " + today;
+        String selection = EventColumns.PLAN_TIME + " >= " + today + " AND " + EventColumns.PLAN_TIME + "<" + tomorrow;
+        String orderBy = EventColumns.CREATE_TIME;
         String limit = " " + count;
         SQLiteDatabase db = getReadable();
         Cursor cursor = db.query(TABLE_NAME, eventColumns, selection, null, null, null, orderBy, limit);
@@ -58,15 +59,36 @@ public class Database {
         return events;
     }
 
-    public void insertEvent(Event event) {
-        String TABLE_NAME = EventColumn.class.getSimpleName();
+    public long insertEvent(Event event) {
+        String TABLE_NAME = EventColumns.class.getSimpleName();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(EventColumn.EVENT_NAME, event.getEventName());
-        contentValues.put(EventColumn.TIME, event.getTime());
-        contentValues.put(EventColumn.SOUND, event.getSound());
-        contentValues.put(EventColumn.CREATE_TIME, event.getCreateTime());
+        contentValues.put(EventColumns.EVENT_NAME, event.getEventName());
+        contentValues.put(EventColumns.TIME, event.getTime());
+        contentValues.put(EventColumns.SOUND, event.getSound());
+        contentValues.put(EventColumns.PLAN_TIME, event.getPlanTime());
+        contentValues.put(EventColumns.CREATE_TIME, event.getCreateTime());
         SQLiteDatabase db = getWritable();
-        db.insert(TABLE_NAME, null, contentValues);
+        return db.insert(TABLE_NAME, null, contentValues);
+    }
+
+    public void deleteEvent(Event event) {
+        String whereClause = EventColumns._ID + "=?";
+        String[] whereArgs = {String.valueOf(event.getEventID())};
+        SQLiteDatabase db = getWritable();
+        db.delete(EventColumns.class.getSimpleName(), whereClause, whereArgs);
+    }
+
+    public void updateEvent(Event event) {
+        String where = EventColumns._ID + "= ? ";
+        String[] args = {String.valueOf(event.getEventID())};
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(EventColumns.EVENT_NAME, event.getEventName());
+        contentValues.put(EventColumns.TIME, event.getTime());
+        contentValues.put(EventColumns.SOUND, event.getSound());
+        contentValues.put(EventColumns.PLAN_TIME, event.getPlanTime());
+        contentValues.put(EventColumns.CREATE_TIME, event.getCreateTime());
+        SQLiteDatabase db = getWritable();
+        db.update(EventColumns.class.getSimpleName(), contentValues, where, args);
     }
 
 }
