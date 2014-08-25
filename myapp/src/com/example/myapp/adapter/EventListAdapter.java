@@ -32,22 +32,26 @@ public class EventListAdapter extends BaseAdapter {
 
     public void addEventsFirst(List<Event> events) {
         mEventList.addAll(0, events);
+        notifyDataSetChanged();
     }
 
     public void addEventsLast(List<Event> events) {
         mEventList.addAll(events);
+        notifyDataSetChanged();
     }
 
     public void addEventFirst(Event event) {
         mEventList.addFirst(event);
+        notifyDataSetChanged();
     }
 
     public void addEventLast(Event event) {
         mEventList.addLast(event);
+        notifyDataSetChanged();
     }
 
     public List<Event> getEventList() {
-        return null;
+        return mEventList;
     }
 
     @Override

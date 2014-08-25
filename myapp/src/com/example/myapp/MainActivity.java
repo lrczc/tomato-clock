@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.widget.RadioGroup;
 
 import com.example.myapp.adapter.FragmentTabAdapter;
+import com.example.myapp.database.OpenHelper;
+import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.fragment.PlanFragment;
 import com.example.myapp.fragment.RecordFragment;
 import com.example.myapp.fragment.TodayFragment;
@@ -21,6 +23,12 @@ public class MainActivity extends FragmentActivity {
     private List<Fragment> mFragments = new ArrayList<Fragment>();
 
     private FragmentTabAdapter mTabAdapter;
+
+    private TomatoOpenHelper mOpenHelper;
+
+    public TomatoOpenHelper getOpenHelper() {
+        return mOpenHelper;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,6 +50,8 @@ public class MainActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        mOpenHelper = new TomatoOpenHelper(getApplicationContext());
 
         mFragments.add(new TodayFragment(this));
         mFragments.add(new PlanFragment(this));

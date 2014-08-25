@@ -9,8 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add"
-        android:textColor="@color/main_text_color"
-        style="@style/main_text_style"
         android:id="@+id/add_item"
         android:gravity="center"/>
     <View
@@ -22,6 +20,8 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:id="@+id/event_list"></ListView>
 
 </LinearLayout>  
