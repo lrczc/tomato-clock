@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.myapp.AppUtil;
 import com.example.myapp.R;
 import com.example.myapp.model.Event;
 
@@ -91,7 +92,6 @@ public class EventListAdapter extends BaseAdapter {
         private TextView title;
         private TextView subtitle;
 
-        private static String MINUTE = "分钟";
         private static String NO_TIME = "未设置时间";
 
         private ViewHolder(View view) {
@@ -112,7 +112,7 @@ public class EventListAdapter extends BaseAdapter {
         public void render(Event event) {
             title.setText(event.getEventName());
             if (event.getTime() != 0) {
-                subtitle.setText(event.getTime()+MINUTE);
+                subtitle.setText(AppUtil.TIME_TITLE[event.getTime()]);
             } else {
                 subtitle.setText(NO_TIME);
             }

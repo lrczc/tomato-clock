@@ -31,6 +31,28 @@ public class Database {
         return mOpenHelper.getReadableDatabase();
     }
 
+    public Event getEvent(long id) {
+        String[] eventColumns = new String[] {
+                EventColumns._ID, EventColumns.EVENT_NAME, EventColumns.TIME, EventColumns.SOUND, EventColumns.PLAN_TIME, EventColumns.CREATE_TIME
+        };
+        String selection = EventColumns._ID + "=" + id;
+        SQLiteDatabase db = getReadable();
+        Cursor cursor = db.query(EventColumns.class.getSimpleName(), eventColumns, selection, null, null, null, null, null);
+        Event event = new Event();
+        if (cursor.moveToNext()) {
+            event.setEventID(cursor.getInt(0));
+            event.setEventName(cursor.getString(1));
+            event.setTime(cursor.getInt(2));
+            event.setSound(cursor.getInt(3));
+            event.setPlanTime(cursor.getLong(4));
+            event.setCreateTime(cursor.getLong(5));
+            cursor.close();
+            return event;
+        }
+        cursor.close();
+        return null;
+    }
+
 
     public List<Event> getTodayEvent(String count) {
         String TABLE_NAME = EventColumns.class.getSimpleName();
@@ -52,7 +74,8 @@ public class Database {
             event.setEventName(cursor.getString(1));
             event.setTime(cursor.getInt(2));
             event.setSound(cursor.getInt(3));
-            event.setCreateTime(cursor.getInt(4));
+            event.setPlanTime(cursor.getLong(4));
+            event.setCreateTime(cursor.getLong(5));
             events.add(event);
         }
         cursor.close();

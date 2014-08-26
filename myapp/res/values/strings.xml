@@ -2,9 +2,15 @@
 <resources>
     <string name="app_name">番茄钟</string>
     <string name="plan">计划</string>
-    <string name="today">今日事件</string>
+    <string name="today_event">今日事件</string>
+    <string name="today">今日</string>
+    <string name="date_select">日期选择</string>
     <string name="record">记录</string>
     <string name="add">添加</string>
+    <string name="set_time">时间设置</string>
+    <string name="set_plan_time">计划时间设置</string>
+    <string name="set_sound">声音设置</string>
+    <string name="minute">分钟</string>
     <string name="setting">设置</string>
     <string name="event_name">事件名称</string>
     <string name="error_info">错误信息</string>

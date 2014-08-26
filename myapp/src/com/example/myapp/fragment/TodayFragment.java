@@ -3,6 +3,7 @@ package com.example.myapp.fragment;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.myapp.DetailEventActivity;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
 import com.example.myapp.adapter.EventListAdapter;
@@ -144,17 +146,12 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        dialog = new AddDialogFragment(getString(R.id.add_item), new AddDialogFragment.AddDialogListener() {
-            @Override
-            public void onDialogPositiveClick(AddDialogFragment dialog) {
-
-            }
-
-            @Override
-            public void onDialogNegativeClick(AddDialogFragment dialog) {
-
-            }
-        });
+        long eventId = mEventAdapter.getItem(position).getEventID();
+        Intent intent = new Intent(getActivity(), DetailEventActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong("event_id", eventId);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {
@@ -210,24 +207,6 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
             int count = params.length;
             for (int i=0; i<count; i++) {
                 mDb.deleteEvent(params[i]);
-            }
-            return null;
-        }
-    }
-
-    static class UpdateEventTask extends AsyncTask<Event, Void, Void> {
-
-        private Database mDb;
-
-        UpdateEventTask(Database mDb) {
-            this.mDb = mDb;
-        }
-
-        @Override
-        protected Void doInBackground(Event... params) {
-            int count = params.length;
-            for (int i=0; i<count; i++) {
-                mDb.updateEvent(params[i]);
             }
             return null;
         }

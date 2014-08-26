@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:text="@string/today"
+            android:text="@string/today_event"
             style="@style/radio_style"
             android:drawableTop="@android:drawable/star_big_off"/>
 
