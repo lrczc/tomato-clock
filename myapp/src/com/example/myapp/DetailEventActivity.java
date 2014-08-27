@@ -1,6 +1,12 @@
 package com.example.myapp;
 
+
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +15,7 @@ import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -20,12 +27,15 @@ import com.example.myapp.model.Event;
 
 import java.lang.ref.SoftReference;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Created by shizhao.czc on 2014/8/26.
  */
-public class DetailEventActivity extends Activity implements IFOnEventFetchListener {
+public class DetailEventActivity extends Activity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener {
+
+    private static final String TAG = "detail event";
 
     private EditText mEtEventName;
 
@@ -33,7 +43,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
     private Spinner mSpEventTime, mSpSound;
 
-    private TextView mTvPlanTime;
+    private TextView mTvPlanTime, mTvRealTime;
 
     private ArrayAdapter<String> mTimeAdapter, mSoundAdapter;
 
@@ -41,15 +51,39 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
     private TomatoOpenHelper mOpenHelper;
 
+    private long startTime;
+
+    private boolean starting = false;
+
     private Database mDb;
+
+    private DatePickerDialog dialog;
 
     public static final int MSG_UPDATE_EVENT = 0x01;
 
+    public static final int MSG_UPDATE_TIME = 0x02;
+
+    public static final int MSG_TIMESUP = 0x03;
+
+    static final int DELAY_TIME = 100;
+
     private EventHandler mHandler;
+
+    private AlarmManager mAlarmManager;
+
+    PendingIntent pIntent;
 
     @Override
     public void onEventFetch(Event event) {
         mEvent = event;
+        mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        Date date = new Date(year-1900, monthOfYear, dayOfMonth);
+        mEvent.setPlanTime(date.getTime());
+        new UpdateTask(mDb).execute(mEvent);
         mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
     }
 
@@ -63,20 +97,39 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
         @Override
         public void handleMessage(Message msg) {
+            SimpleDateFormat dateFormat1=new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat2 = new SimpleDateFormat("mm:ss:SSS");
+            long totalTime = AppUtil.TIME[mEvent.getTime()]*60000;
             switch (msg.what) {
-                case MSG_UPDATE_EVENT:
+                case MSG_UPDATE_EVENT: {
                     mEtEventName.setText(mEvent.getEventName());
                     mSpEventTime.setSelection(mEvent.getTime(), true);
                     mSpSound.setSelection(mEvent.getSound(), true);
-                    SimpleDateFormat dateformat1=new SimpleDateFormat("yyyy-MM-dd");
-                    String planTime = dateformat1.format(new Date(mEvent.getPlanTime()));
-                    String today = dateformat1.format(new Date());
+                    String planTime = dateFormat1.format(new Date(mEvent.getPlanTime()));
+                    String today = dateFormat1.format(new Date());
                     if (today.equals(planTime)) {
                         mTvPlanTime.setText(R.string.today);
                     } else {
                         mTvPlanTime.setText(planTime);
                     }
+                    if (!starting) {
+                        String realTime = dateFormat2.format(new Date(totalTime));
+                        mTvRealTime.setText(realTime);
+                    }
                     break;
+                }
+                case MSG_UPDATE_TIME: {
+                    long remain_time = totalTime-(System.currentTimeMillis()-startTime);
+                    if (remain_time > 0) {
+                        String realTime = dateFormat2.format(new Date(remain_time));
+                        mTvRealTime.setText(realTime);
+                        sendEmptyMessageDelayed(MSG_UPDATE_TIME, DELAY_TIME);
+                    } else {
+
+                        finish();
+                    }
+                    break;
+                }
             }
         }
     }
@@ -85,6 +138,8 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_event_layout);
+
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         mOpenHelper = new TomatoOpenHelper(getApplicationContext());
         mDb = new Database(mOpenHelper);
@@ -98,8 +153,46 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         new LoadTask(mDb, this).execute(eventId);
 
         mBtnStartEvent = (ImageView) findViewById(R.id.btn_start);
+        mBtnStartEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!starting) {
+                    starting = true;
+                    Calendar calendar=Calendar.getInstance();
+                    startTime = System.currentTimeMillis();
+                    calendar.setTimeInMillis(startTime);
+                    calendar.add(Calendar.MINUTE, AppUtil.TIME[mEvent.getTime()]);
+                    Intent broadcastIntent = new Intent(AlarmReceiver.ALARM_ALERT_ACTION);
+                    broadcastIntent.putExtra("sound_res", AppUtil.SOUND[mEvent.getSound()]);
+                    pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
+                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                    //AlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
+                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
+                    mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                } else {
+                    starting = false;
+                    mAlarmManager.cancel(pIntent);
+                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
+                    mHandler.removeMessages(MSG_UPDATE_TIME);
+                    mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                }
+
+            }
+        });
         mEtEventName = (EditText) findViewById(R.id.et_event_name);
+        mTvRealTime = (TextView) findViewById(R.id.real_time);
         mTvPlanTime = (TextView) findViewById(R.id.plan_time);
+        mTvPlanTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                dialog = new DatePickerDialog(DetailEventActivity.this, DetailEventActivity.this, year, month, day);
+                dialog.show();
+            }
+        });
         mSpEventTime = (Spinner) findViewById(R.id.time_picker);
         mTimeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, AppUtil.TIME_TITLE);
         mTimeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -114,6 +207,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                     mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -140,6 +234,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         });
         mSpSound.setVisibility(View.VISIBLE);
     }
+
 
     static class LoadTask extends AsyncTask<Long, Void, Event> {
 
@@ -177,6 +272,21 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         @Override
         protected Void doInBackground(Event... params) {
             mDb.updateEvent(params[0]);
+            return null;
+        }
+    }
+
+    static class DeleteTask extends AsyncTask<Event, Void, Void> {
+
+        Database mDb;
+
+        DeleteTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            mDb.deleteEvent(params[0]);
             return null;
         }
     }

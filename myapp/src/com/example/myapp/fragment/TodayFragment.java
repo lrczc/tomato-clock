@@ -168,7 +168,7 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
 
         @Override
         protected List<Event> doInBackground(Void... params) {
-            return mDb.getTodayEvent(count);
+            return mDb.getTodayEvents(count);
         }
 
         @Override

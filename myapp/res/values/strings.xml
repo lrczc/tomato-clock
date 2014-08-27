@@ -9,6 +9,7 @@
     <string name="add">添加</string>
     <string name="set_time">时间设置</string>
     <string name="set_plan_time">计划时间设置</string>
+    <string name="mission_complete">任务完成！</string>
     <string name="set_sound">声音设置</string>
     <string name="minute">分钟</string>
     <string name="setting">设置</string>
