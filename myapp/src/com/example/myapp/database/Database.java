@@ -124,7 +124,7 @@ public class Database {
                 RecordEventColumns.PLAN_TIME, RecordEventColumns.CREATE_TIME,
                 RecordEventColumns.COMPLETE_TIME
         };
-        String orderBy = RecordEventColumns.COMPLETE_TIME;
+        String orderBy = RecordEventColumns.COMPLETE_TIME + " desc";
         SQLiteDatabase db = getReadable();
         Cursor cursor = db.query(TABLE_NAME, eventColumns, null, null, null, null, orderBy, null);
         List<RecordEvent> events = new ArrayList<RecordEvent>();

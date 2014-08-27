@@ -10,10 +10,10 @@ import com.example.myapp.model.RecordEvent;
  */
 public class TomatoOpenHelper extends OpenHelper {
     public static final String DATABASE_NAME = "myDatabase.db";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
 
     public TomatoOpenHelper(Context context) {
-        super(context, DATABASE_NAME, DATABASE_VERSION, EventColumns.class, RecordEvent.class);
+        super(context, DATABASE_NAME, DATABASE_VERSION, EventColumns.class, RecordEventColumns.class);
     }
 
     @Override

@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +22,7 @@ import android.widget.TextView;
 import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.model.Event;
+import com.example.myapp.model.RecordEvent;
 
 import java.lang.ref.SoftReference;
 import java.text.SimpleDateFormat;
@@ -125,7 +124,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                         mTvRealTime.setText(realTime);
                         sendEmptyMessageDelayed(MSG_UPDATE_TIME, DELAY_TIME);
                     } else {
-
+                        new CompleteTask(mDb).execute(mEvent);
                         finish();
                     }
                     break;
@@ -276,16 +275,19 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         }
     }
 
-    static class DeleteTask extends AsyncTask<Event, Void, Void> {
+    static class CompleteTask extends AsyncTask<Event, Void, Void> {
 
         Database mDb;
 
-        DeleteTask(Database mDb) {
+        CompleteTask(Database mDb) {
             this.mDb = mDb;
         }
 
         @Override
         protected Void doInBackground(Event... params) {
+            RecordEvent recordEvent = new RecordEvent(params[0]);
+            recordEvent.setCompleteTime(System.currentTimeMillis());
+            mDb.insertRecordEvent(recordEvent);
             mDb.deleteEvent(params[0]);
             return null;
         }
