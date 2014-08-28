@@ -1,8 +1,10 @@
 package com.example.myapp.adapter;
 
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.example.myapp.R;
@@ -20,6 +22,8 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
 
     private int currentTab; // 当前Tab页面索引
 
+    int tabBackground, selectedTabBackground;
+
     private OnRgsExtraCheckedChangedListener onRgsExtraCheckedChangedListener; // 用于让调用者在切换tab时候增加新的功能
 
     public FragmentTabAdapter(FragmentActivity fragmentActivity, List<Fragment> fragments, int fragmentContentId, RadioGroup rgs) {
@@ -28,20 +32,26 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
         this.fragmentActivity = fragmentActivity;
         this.fragmentContentId = fragmentContentId;
 
-        // 默认显示第一页
-        FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
-        ft.add(fragmentContentId, fragments.get(0));
-        ft.commit();
+        currentTab = 0;
 
+        // 默认显示第一页
+        //FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
+        //ft.add(fragmentContentId, fragments.get(0));
+        //ft.commit();
+
+        tabBackground = fragmentActivity.getResources().getColor(R.color.tab_background);
+        selectedTabBackground = fragmentActivity.getResources().getColor(R.color.selected_tab);
+        //rgs.getChildAt(0).setBackgroundColor(selectedTabBackground);
         rgs.setOnCheckedChangeListener(this);
 
-
+        ((RadioButton) rgs.getChildAt(0)).setChecked(true);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
         for(int i = 0; i < rgs.getChildCount(); i++){
             if(rgs.getChildAt(i).getId() == checkedId){
+                rgs.getChildAt(i).setBackgroundColor(selectedTabBackground);
                 Fragment fragment = fragments.get(i);
                 FragmentTransaction ft = obtainFragmentTransaction(i);
 
@@ -62,6 +72,8 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
                     onRgsExtraCheckedChangedListener.OnRgsExtraCheckedChanged(radioGroup, checkedId, i);
                 }
 
+            } else {
+                rgs.getChildAt(i).setBackgroundColor(tabBackground);
             }
         }
 

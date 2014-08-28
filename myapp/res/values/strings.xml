@@ -16,6 +16,7 @@
     <string name="event_name">事件名称</string>
     <string name="error_info">错误信息</string>
     <string name="add_failed">添加错误</string>
+    <string name="if_give_up">是否决定放弃？</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="add_today_event">添加今日事件</string>

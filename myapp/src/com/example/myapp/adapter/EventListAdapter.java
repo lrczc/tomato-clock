@@ -1,5 +1,6 @@
 package com.example.myapp.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,6 +117,8 @@ public class EventListAdapter extends BaseAdapter {
             } else {
                 subtitle.setText(NO_TIME);
             }
+            title.setTextColor(Color.BLACK);
+            subtitle.setTextColor(Color.DKGRAY);
         }
     }
 }

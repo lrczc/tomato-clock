@@ -3,8 +3,10 @@ package com.example.myapp;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -164,16 +166,29 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                     Intent broadcastIntent = new Intent(AlarmReceiver.ALARM_ALERT_ACTION);
                     broadcastIntent.putExtra("sound_res", AppUtil.SOUND[mEvent.getSound()]);
                     pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
-                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-                    //AlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
+                    //mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
                     mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
                     mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
                 } else {
-                    starting = false;
-                    mAlarmManager.cancel(pIntent);
-                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
-                    mHandler.removeMessages(MSG_UPDATE_TIME);
-                    mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                    new AlertDialog.Builder(DetailEventActivity.this)
+                            .setMessage(R.string.if_give_up)
+                            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    starting = false;
+                                    mAlarmManager.cancel(pIntent);
+                                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
+                                    mHandler.removeMessages(MSG_UPDATE_TIME);
+                                    mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .create().show();
                 }
 
             }

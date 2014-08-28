@@ -1,5 +1,6 @@
 package com.example.myapp.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,6 +114,8 @@ public class RecordEventListAdapter extends BaseAdapter {
             SimpleDateFormat dateFormat1=new SimpleDateFormat("yyyy-MM-dd");
             String str = "完成日期：" + dateFormat1.format(new Date(event.getCompleteTime()));
             subtitle.setText(str);
+            title.setTextColor(Color.BLACK);
+            subtitle.setTextColor(Color.DKGRAY);
         }
     }
 }
