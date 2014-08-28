@@ -7,14 +7,18 @@
     <string name="date_select">日期选择</string>
     <string name="record">记录</string>
     <string name="add">添加</string>
+    <string name="event_time">事件时间</string>
     <string name="set_time">时间设置</string>
     <string name="set_plan_time">计划时间设置</string>
+    <string name="complete_time">完成日期</string>
     <string name="mission_complete">任务完成！</string>
-    <string name="set_sound">声音设置</string>
+    <string name="set_sound">音频设置</string>
+    <string name="sound">音频</string>
     <string name="minute">分钟</string>
     <string name="setting">设置</string>
     <string name="event_name">事件名称</string>
     <string name="error_info">错误信息</string>
+    <string name="not_set_time">未设置时间</string>
     <string name="add_failed">添加错误</string>
     <string name="if_give_up">是否决定放弃？</string>
     <string name="confirm">确定</string>
@@ -22,4 +26,6 @@
     <string name="add_today_event">添加今日事件</string>
     <string name="delete_confirm">确认删除</string>
     <string name="if_delete">是否删除？</string>
+    <string name="comment">评论</string>
+    <string name="grade">评分</string>
 </resources>

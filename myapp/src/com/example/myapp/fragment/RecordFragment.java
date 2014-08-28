@@ -1,6 +1,9 @@
 package com.example.myapp.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.myapp.DetailRecordEventActivity;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
 import com.example.myapp.adapter.RecordEventListAdapter;
@@ -62,13 +66,34 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return false;
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.delete_confirm)
+                .setMessage(R.string.if_delete)
+                .setPositiveButton(R.string.confirm,new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteEventTask(mDb).execute(mEventAdapter.getItem(position));
+                        mEventAdapter.deleteEvent(position);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+        return true;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        long eventId = mEventAdapter.getItem(position).getEventID();
+        Intent intent = new Intent(getActivity(), DetailRecordEventActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong("event_id", eventId);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     static class LoadTask extends AsyncTask<Void, Void, List<RecordEvent>> {
@@ -90,6 +115,23 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
         protected void onPostExecute(List<RecordEvent> events) {
             super.onPostExecute(events);
             mEventAdapter.changeEvents(events);
+        }
+    }
+
+    static class DeleteEventTask extends AsyncTask<RecordEvent, Void, Void> {
+        private Database mDb;
+
+        DeleteEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(RecordEvent... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                mDb.deleteRecordEvent(params[i]);
+            }
+            return null;
         }
     }
 }

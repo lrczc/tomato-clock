@@ -143,7 +143,7 @@ public class Database {
         return events;
     }
 
-    public RecordEvent getRecordEvent(int recordEventId) {
+    public RecordEvent getRecordEvent(long recordEventId) {
         String[] eventColumns = new String[] {
                 RecordEventColumns._ID, RecordEventColumns.EVENT_NAME,
                 RecordEventColumns.TIME, RecordEventColumns.SOUND,
@@ -180,6 +180,13 @@ public class Database {
         contentValues.put(RecordEventColumns.COMPLETE_TIME, event.getCompleteTime());
         SQLiteDatabase db = getWritable();
         return db.insert(TABLE_NAME, null, contentValues);
+    }
+
+    public void deleteRecordEvent(RecordEvent event) {
+        String whereClause = RecordEventColumns._ID + "=?";
+        String[] whereArgs = {String.valueOf(event.getEventID())};
+        SQLiteDatabase db = getWritable();
+        db.delete(RecordEventColumns.class.getSimpleName(), whereClause, whereArgs);
     }
 
 }

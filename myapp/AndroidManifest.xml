@@ -22,6 +22,9 @@
         <activity
             android:name=".DetailEventActivity"
             android:label="事件信息" />
+        <activity
+            android:name=".DetailRecordEventActivity"
+            android:label="记录详情" />
 
         <receiver android:name=".AlarmReceiver">
             <intent-filter>

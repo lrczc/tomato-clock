@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
@@ -149,8 +150,6 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
         Intent intent = getIntent();
         long eventId = intent.getExtras().getLong("event_id");
-
-        mEvent = new Event();
         new LoadTask(mDb, this).execute(eventId);
 
         mBtnStartEvent = (ImageView) findViewById(R.id.btn_start);
@@ -158,6 +157,10 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             @Override
             public void onClick(View v) {
                 if (!starting) {
+                    if (mEvent.getTime() == 0) {
+                        Toast.makeText(DetailEventActivity.this, R.string.not_set_time, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     starting = true;
                     Calendar calendar=Calendar.getInstance();
                     startTime = System.currentTimeMillis();
@@ -166,8 +169,8 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                     Intent broadcastIntent = new Intent(AlarmReceiver.ALARM_ALERT_ACTION);
                     broadcastIntent.putExtra("sound_res", AppUtil.SOUND[mEvent.getSound()]);
                     pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
-                    //mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
+                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                    //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
                     mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
                     mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
                 } else {
