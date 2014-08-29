@@ -55,6 +55,29 @@ public class Database {
         return null;
     }
 
+    public List<Event> getEvents(String count) {
+        String TABLE_NAME = EventColumns.class.getSimpleName();
+        String[] eventColumns = new String[] {
+                EventColumns._ID, EventColumns.EVENT_NAME, EventColumns.TIME, EventColumns.SOUND, EventColumns.PLAN_TIME, EventColumns.CREATE_TIME
+        };
+        String orderBy = EventColumns.PLAN_TIME;
+        String limit = " " + count;
+        SQLiteDatabase db = getReadable();
+        Cursor cursor = db.query(TABLE_NAME, eventColumns, null, null, null, null, orderBy, limit);
+        List<Event> events = new ArrayList<Event>();
+        while (cursor.moveToNext()) {
+            Event event = new Event();
+            event.setEventID(cursor.getInt(0));
+            event.setEventName(cursor.getString(1));
+            event.setTime(cursor.getInt(2));
+            event.setSound(cursor.getInt(3));
+            event.setPlanTime(cursor.getLong(4));
+            event.setCreateTime(cursor.getLong(5));
+            events.add(event);
+        }
+        cursor.close();
+        return events;
+    }
 
     public List<Event> getTodayEvents(String count) {
         String TABLE_NAME = EventColumns.class.getSimpleName();

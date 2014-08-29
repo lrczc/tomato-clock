@@ -60,7 +60,6 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
         TomatoOpenHelper openHelper = ((MainActivity) getActivity()).getOpenHelper();
         mDb = new Database(openHelper);
         mEventAdapter = new EventListAdapter(getLayoutInflater(savedInstanceState));
-        mEventAdapter.changeEvents(mEventList);
     }
 
     @Override

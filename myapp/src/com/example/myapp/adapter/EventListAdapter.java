@@ -11,6 +11,7 @@ import com.example.myapp.AppUtil;
 import com.example.myapp.R;
 import com.example.myapp.model.Event;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -29,21 +30,6 @@ public class EventListAdapter extends BaseAdapter {
     public void changeEvents(List<Event> events) {
         mEventList.clear();
         mEventList.addAll(events);
-        notifyDataSetChanged();
-    }
-
-    public void addEventsFirst(List<Event> events) {
-        mEventList.addAll(0, events);
-        notifyDataSetChanged();
-    }
-
-    public void addEventsLast(List<Event> events) {
-        mEventList.addAll(events);
-        notifyDataSetChanged();
-    }
-
-    public void addEventFirst(Event event) {
-        mEventList.addFirst(event);
         notifyDataSetChanged();
     }
 
@@ -117,8 +103,6 @@ public class EventListAdapter extends BaseAdapter {
             } else {
                 subtitle.setText(NO_TIME);
             }
-            title.setTextColor(Color.BLACK);
-            subtitle.setTextColor(Color.DKGRAY);
         }
     }
 }

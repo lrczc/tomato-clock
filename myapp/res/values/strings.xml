@@ -12,6 +12,7 @@
     <string name="set_plan_time">计划时间设置</string>
     <string name="complete_time">完成日期</string>
     <string name="mission_complete">任务完成！</string>
+    <string name="mission_failed">任务失败！</string>
     <string name="set_sound">音频设置</string>
     <string name="sound">音频</string>
     <string name="minute">分钟</string>

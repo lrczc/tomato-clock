@@ -5,12 +5,16 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="15sp"
         android:id="@+id/title"/>
 
     <TextView
+        android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="10sp"
         android:id="@+id/subtitle"/>
 </LinearLayout>

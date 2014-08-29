@@ -78,6 +78,9 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
     @Override
     public void onEventFetch(Event event) {
         mEvent = event;
+        Intent broadcastIntent = new Intent(AlarmReceiver.ALARM_ALERT_ACTION);
+        broadcastIntent.putExtra("sound_res", AppUtil.SOUND[mEvent.getSound()]);
+        pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
         mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
     }
 
@@ -166,9 +169,6 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                     startTime = System.currentTimeMillis();
                     calendar.setTimeInMillis(startTime);
                     calendar.add(Calendar.MINUTE, AppUtil.TIME[mEvent.getTime()]);
-                    Intent broadcastIntent = new Intent(AlarmReceiver.ALARM_ALERT_ACTION);
-                    broadcastIntent.putExtra("sound_res", AppUtil.SOUND[mEvent.getSound()]);
-                    pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
                     mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
                     //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
                     mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
@@ -252,6 +252,12 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         mSpSound.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAlarmManager.cancel(pIntent);
+        Toast.makeText(getApplicationContext(), R.string.mission_failed, Toast.LENGTH_SHORT).show();
+    }
 
     static class LoadTask extends AsyncTask<Long, Void, Event> {
 

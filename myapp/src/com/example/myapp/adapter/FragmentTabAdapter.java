@@ -1,6 +1,5 @@
 package com.example.myapp.adapter;
 
-import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -14,7 +13,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/22.
  */
-public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
+public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener {
     private List<Fragment> fragments; // 一个tab页面对应一个Fragment
     private RadioGroup rgs; // 用于切换tab
     private FragmentActivity fragmentActivity; // Fragment所属的Activity
@@ -22,7 +21,7 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
 
     private int currentTab; // 当前Tab页面索引
 
-    int tabBackground, selectedTabBackground;
+    int tabBackground, selectedTabBackground, tabText;
 
     private OnRgsExtraCheckedChangedListener onRgsExtraCheckedChangedListener; // 用于让调用者在切换tab时候增加新的功能
 
@@ -41,16 +40,21 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
 
         tabBackground = fragmentActivity.getResources().getColor(R.color.tab_background);
         selectedTabBackground = fragmentActivity.getResources().getColor(R.color.selected_tab);
+        tabText = fragmentActivity.getResources().getColor(R.color.tab_text);
         //rgs.getChildAt(0).setBackgroundColor(selectedTabBackground);
         rgs.setOnCheckedChangeListener(this);
 
+        for (int i = 0; i < rgs.getChildCount(); i++) {
+            ((RadioButton) rgs.getChildAt(i)).setTextColor(tabText);
+        }
         ((RadioButton) rgs.getChildAt(0)).setChecked(true);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        for(int i = 0; i < rgs.getChildCount(); i++){
-            if(rgs.getChildAt(i).getId() == checkedId){
+        for (int i = 0; i < rgs.getChildCount(); i++) {
+            if (rgs.getChildAt(i).getId() == checkedId) {
+                ((RadioButton) rgs.getChildAt(i)).setTextColor(tabText);
                 rgs.getChildAt(i).setBackgroundColor(selectedTabBackground);
                 Fragment fragment = fragments.get(i);
                 FragmentTransaction ft = obtainFragmentTransaction(i);
@@ -58,20 +62,19 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
                 getCurrentFragment().onPause(); // 暂停当前tab
 //                getCurrentFragment().onStop(); // 暂停当前tab
 
-                if(fragment.isAdded()){
+                if (fragment.isAdded()) {
 //                    fragment.onStart(); // 启动目标tab的onStart()
                     fragment.onResume(); // 启动目标tab的onResume()
-                }else{
+                } else {
                     ft.add(fragmentContentId, fragment);
                 }
                 showTab(i); // 显示目标tab
                 ft.commit();
 
                 // 如果设置了切换tab额外功能功能接口
-                if(null != onRgsExtraCheckedChangedListener){
+                if (null != onRgsExtraCheckedChangedListener) {
                     onRgsExtraCheckedChangedListener.OnRgsExtraCheckedChanged(radioGroup, checkedId, i);
                 }
-
             } else {
                 rgs.getChildAt(i).setBackgroundColor(tabBackground);
             }
@@ -81,16 +84,17 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
 
     /**
      * 切换tab
+     *
      * @param idx
      */
-    private void showTab(int idx){
-        for(int i = 0; i < fragments.size(); i++){
+    private void showTab(int idx) {
+        for (int i = 0; i < fragments.size(); i++) {
             Fragment fragment = fragments.get(i);
             FragmentTransaction ft = obtainFragmentTransaction(idx);
 
-            if(idx == i){
+            if (idx == i) {
                 ft.show(fragment);
-            }else{
+            } else {
                 ft.hide(fragment);
             }
             ft.commit();
@@ -100,15 +104,16 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
 
     /**
      * 获取一个带动画的FragmentTransaction
+     *
      * @param index
      * @return
      */
-    private FragmentTransaction obtainFragmentTransaction(int index){
+    private FragmentTransaction obtainFragmentTransaction(int index) {
         FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
         // 设置切换动画
-        if(index > currentTab){
+        if (index > currentTab) {
             ft.setCustomAnimations(R.anim.slide_right_in, R.anim.slide_left_out);
-        }else{
+        } else {
             ft.setCustomAnimations(R.anim.slide_left_in, R.anim.slide_right_out);
         }
         return ft;
@@ -118,7 +123,7 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
         return currentTab;
     }
 
-    public Fragment getCurrentFragment(){
+    public Fragment getCurrentFragment() {
         return fragments.get(currentTab);
     }
 
@@ -131,9 +136,9 @@ public class FragmentTabAdapter implements RadioGroup.OnCheckedChangeListener{
     }
 
     /**
-     *  切换tab额外功能功能接口
+     * 切换tab额外功能功能接口
      */
-    public static interface OnRgsExtraCheckedChangedListener{
+    public static interface OnRgsExtraCheckedChangedListener {
         public void OnRgsExtraCheckedChanged(RadioGroup radioGroup, int checkedId, int index);
     }
 

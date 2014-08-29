@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.myapp.AppUtil;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
+import com.example.myapp.adapter.EventCategoryAdapter;
 import com.example.myapp.adapter.EventListAdapter;
 import com.example.myapp.adapter.RecordEventListAdapter;
 import com.example.myapp.database.Database;
@@ -19,6 +21,7 @@ import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -26,15 +29,85 @@ import java.util.List;
  */
 public class PlanFragment extends Fragment {
 
+    private static final String COUNT = "100";
+
     private Context mContext;
+
+    private EventCategoryAdapter adapter;
+
+    private ListView mLvEventList;
+
+    private Database mDb;
+
+    private LayoutInflater inflater;
 
     public PlanFragment(Context context) {
         mContext = context;
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        inflater = getLayoutInflater(savedInstanceState);
+        adapter = new EventCategoryAdapter(inflater);
+        TomatoOpenHelper openHelper = ((MainActivity) getActivity()).getOpenHelper();
+        mDb = new Database(openHelper);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.plan_fragment_layout, container, false);
+        mLvEventList = (ListView) view.findViewById(R.id.event_list);
+        mLvEventList.setAdapter(adapter);
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        new LoadTask(mDb, COUNT, adapter, inflater).execute();
+    }
+
+    static class LoadTask extends AsyncTask<Void, Void, List<Event>> {
+
+        private Database mDb;
+        private String count;
+        private EventCategoryAdapter mAdapter;
+        private LayoutInflater inflater;
+
+        LoadTask(Database mDb, String count, EventCategoryAdapter mAdapter, LayoutInflater inflater) {
+            this.mDb = mDb;
+            this.count = count;
+            this.mAdapter = mAdapter;
+            this.inflater = inflater;
+        }
+
+        @Override
+        protected List<Event> doInBackground(Void... params) {
+            return mDb.getEvents(count);
+        }
+
+        @Override
+        protected void onPostExecute(List<Event> events) {
+            super.onPostExecute(events);
+            if (events == null || events.size() == 0)
+                return;
+            mAdapter.clearCategory();
+            events.add(new Event(null, 0));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            int start = 0;
+            long time = events.get(0).getPlanTime();
+            int size = events.size();
+            for (int i=1; i<size; i++) {
+                Event event = events.get(i);
+                if (!AppUtil.isSameDay(time, event.getPlanTime())) {
+                    EventListAdapter eventListAdapter = new EventListAdapter(inflater);
+                    eventListAdapter.changeEvents(events.subList(start, i));
+                    mAdapter.addCategory(AppUtil.timeToString1(time, dateFormat), eventListAdapter);
+                    time = event.getPlanTime();
+                    start = i;
+                }
+            }
+        }
+    }
 }
