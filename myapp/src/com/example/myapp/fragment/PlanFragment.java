@@ -1,6 +1,9 @@
 package com.example.myapp.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.myapp.AppUtil;
+import com.example.myapp.DetailEventActivity;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
 import com.example.myapp.adapter.EventCategoryAdapter;
@@ -27,7 +31,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/22.
  */
-public class PlanFragment extends Fragment {
+public class PlanFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String COUNT = "100";
 
@@ -59,6 +63,8 @@ public class PlanFragment extends Fragment {
         View view = inflater.inflate(R.layout.plan_fragment_layout, container, false);
         mLvEventList = (ListView) view.findViewById(R.id.event_list);
         mLvEventList.setAdapter(adapter);
+        mLvEventList.setOnItemClickListener(this);
+        mLvEventList.setOnItemLongClickListener(this);
         return view;
     }
 
@@ -66,6 +72,37 @@ public class PlanFragment extends Fragment {
     public void onStart() {
         super.onStart();
         new LoadTask(mDb, COUNT, adapter, inflater).execute();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.delete_confirm)
+                .setMessage(R.string.if_delete)
+                .setPositiveButton(R.string.confirm,new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteEventTask(mDb).execute((Event) adapter.getItem(position));
+                        adapter.deleteEvent(position);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+        return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        long eventId = ((Event) adapter.getItem(position)).getEventID();
+        Intent intent = new Intent(getActivity(), DetailEventActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong("event_id", eventId);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {
@@ -108,6 +145,40 @@ public class PlanFragment extends Fragment {
                     start = i;
                 }
             }
+        }
+    }
+
+    static class AddEventTask extends AsyncTask<Event, Void, Void> {
+        private Database mDb;
+
+        AddEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                params[i].setEventID(mDb.insertEvent(params[i]));
+            }
+            return null;
+        }
+    }
+
+    static class DeleteEventTask extends AsyncTask<Event, Void, Void> {
+        private Database mDb;
+
+        DeleteEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                mDb.deleteEvent(params[i]);
+            }
+            return null;
         }
     }
 }

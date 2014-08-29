@@ -43,6 +43,22 @@ public class EventCategoryAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void deleteEvent(int position){
+        for (EventCategory category : categories) {
+            int size = category.getAdapter().getCount() + 1;
+            if (position < size) {
+                category.getAdapter().deleteEvent(position-1);
+                break;
+            }
+            position -= size;
+        }
+        notifyDataSetChanged();
+    }
+
+    public boolean isTitle() {
+        return false;
+    }
+
     public void addEvent(Event event) {
         int size = categories.size();
         for (int i=0; i<size; i++) {
@@ -147,7 +163,8 @@ public class EventCategoryAdapter extends BaseAdapter {
         if (caption.equals(today))
             caption = TODAY;
         titleView.setText(caption);
-        titleView.setClickable(false);
+        titleView.setOnClickListener(null);
+        titleView.setOnLongClickListener(null);
         return titleView;
     }
 }

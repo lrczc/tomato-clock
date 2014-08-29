@@ -255,8 +255,10 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAlarmManager.cancel(pIntent);
-        Toast.makeText(getApplicationContext(), R.string.mission_failed, Toast.LENGTH_SHORT).show();
+        if (starting) {
+            mAlarmManager.cancel(pIntent);
+            Toast.makeText(getApplicationContext(), R.string.mission_failed, Toast.LENGTH_SHORT).show();
+        }
     }
 
     static class LoadTask extends AsyncTask<Long, Void, Event> {
