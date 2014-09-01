@@ -11,6 +11,8 @@
     <string name="set_time">时间设置</string>
     <string name="set_plan_time">计划时间设置</string>
     <string name="complete_time">完成日期</string>
+    <string name="alert_info">提醒</string>
+    <string name="change_to_today">该任务不是今日任务，是否改为现在完成？</string>
     <string name="mission_complete">任务完成！</string>
     <string name="mission_failed">任务失败！</string>
     <string name="set_sound">音频设置</string>
@@ -21,10 +23,13 @@
     <string name="error_info">错误信息</string>
     <string name="not_set_time">未设置时间</string>
     <string name="add_failed">添加错误</string>
+    <string name="error_empty_name">名称不能为空</string>
     <string name="if_give_up">是否决定放弃？</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="add_today_event">添加今日事件</string>
+    <string name="add_event">添加事件</string>
+    <string name="edit_name">编辑名称</string>
     <string name="delete_confirm">确认删除</string>
     <string name="if_delete">是否删除？</string>
     <string name="comment">评论</string>

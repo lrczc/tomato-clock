@@ -1,22 +1,23 @@
 package com.example.myapp;
 
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
+import com.example.myapp.fragment.AddDialogFragment;
 import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
 
@@ -35,11 +37,11 @@ import java.util.Date;
 /**
  * Created by shizhao.czc on 2014/8/26.
  */
-public class DetailEventActivity extends Activity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener {
+public class DetailEventActivity extends FragmentActivity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener {
 
     private static final String TAG = "detail event";
 
-    private EditText mEtEventName;
+    private TextView mTvEventName;
 
     private Event mEvent;
 
@@ -59,13 +61,15 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
     private Database mDb;
 
-    private DatePickerDialog dialog;
+    private DatePickerDialog mDatePickerDialog;
+
+    private AddDialogFragment mAddDialog;
 
     public static final int MSG_UPDATE_EVENT = 0x01;
 
     public static final int MSG_UPDATE_TIME = 0x02;
 
-    public static final int MSG_TIMESUP = 0x03;
+    public static final int MSG_NOTTODAY = 0x03;
 
     static final int DELAY_TIME = 100;
 
@@ -88,8 +92,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         Date date = new Date(year-1900, monthOfYear, dayOfMonth);
         mEvent.setPlanTime(date.getTime());
-        new UpdateTask(mDb).execute(mEvent);
-        mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+        new UpdateTask(mDb, mHandler).execute(mEvent);
     }
 
     class EventHandler extends Handler {
@@ -107,7 +110,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             long totalTime = AppUtil.TIME[mEvent.getTime()]*60000;
             switch (msg.what) {
                 case MSG_UPDATE_EVENT: {
-                    mEtEventName.setText(mEvent.getEventName());
+                    mTvEventName.setText(mEvent.getEventName());
                     mSpEventTime.setSelection(mEvent.getTime(), true);
                     mSpSound.setSelection(mEvent.getSound(), true);
                     String planTime = dateFormat1.format(new Date(mEvent.getPlanTime()));
@@ -139,6 +142,18 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
         }
     }
 
+    private void startClock() {
+        starting = true;
+        Calendar calendar = Calendar.getInstance();
+        startTime = System.currentTimeMillis();
+        calendar.setTimeInMillis(startTime);
+        calendar.add(Calendar.MINUTE, AppUtil.TIME[mEvent.getTime()]);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+        //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
+        mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
+        mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,15 +179,26 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                         Toast.makeText(DetailEventActivity.this, R.string.not_set_time, Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    starting = true;
-                    Calendar calendar=Calendar.getInstance();
-                    startTime = System.currentTimeMillis();
-                    calendar.setTimeInMillis(startTime);
-                    calendar.add(Calendar.MINUTE, AppUtil.TIME[mEvent.getTime()]);
-                    mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-                    //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
-                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
-                    mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                    if (!AppUtil.isSameDay(mEvent.getPlanTime(), System.currentTimeMillis())) {
+                        new AlertDialog.Builder(DetailEventActivity.this)
+                                .setMessage(R.string.change_to_today)
+                                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mEvent.setPlanTime(System.currentTimeMillis());
+                                        new UpdateTask(mDb, mHandler).execute(mEvent);
+                                        startClock();
+                                    }
+                                })
+                                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .create().show();
+                    } else {
+                        startClock();
+                    }
                 } else {
                     new AlertDialog.Builder(DetailEventActivity.this)
                             .setMessage(R.string.if_give_up)
@@ -196,7 +222,26 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
             }
         });
-        mEtEventName = (EditText) findViewById(R.id.et_event_name);
+        mTvEventName = (TextView) findViewById(R.id.tv_event_name);
+        mTvEventName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAddDialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
+                    @Override
+                    public void onDialogPositiveClick(AddDialogFragment dialog) {
+                        String content = dialog.getContent();
+                        mEvent.setEventName(content);
+                        new UpdateTask(mDb, mHandler).execute(mEvent);
+                    }
+
+                    @Override
+                    public void onDialogNegativeClick(AddDialogFragment dialog) {
+                    }
+                });
+                mAddDialog.setContent(mEvent.getEventName());
+                mAddDialog.show(getSupportFragmentManager(), TAG);
+            }
+        });
         mTvRealTime = (TextView) findViewById(R.id.real_time);
         mTvPlanTime = (TextView) findViewById(R.id.plan_time);
         mTvPlanTime.setOnClickListener(new View.OnClickListener() {
@@ -206,8 +251,8 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
-                dialog = new DatePickerDialog(DetailEventActivity.this, DetailEventActivity.this, year, month, day);
-                dialog.show();
+                mDatePickerDialog = new DatePickerDialog(DetailEventActivity.this, DetailEventActivity.this, year, month, day);
+                mDatePickerDialog.show();
             }
         });
         mSpEventTime = (Spinner) findViewById(R.id.time_picker);
@@ -220,8 +265,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mEvent.getTime() != position) {
                     mEvent.setTime(position);
-                    new UpdateTask(mDb).execute(mEvent);
-                    mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                    new UpdateTask(mDb, mHandler).execute(mEvent);
                 }
             }
 
@@ -241,7 +285,7 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mEvent.getSound() != position) {
                     mEvent.setSound(position);
-                    new UpdateTask(mDb).execute(mEvent);
+                    new UpdateTask(mDb, mHandler).execute(mEvent);
                     mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
                 }
             }
@@ -259,6 +303,34 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             mAlarmManager.cancel(pIntent);
             Toast.makeText(getApplicationContext(), R.string.mission_failed, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            if (starting) {
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.if_give_up)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                starting = false;
+                                mAlarmManager.cancel(pIntent);
+                                mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
+                                mHandler.removeMessages(MSG_UPDATE_TIME);
+                                mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .create().show();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     static class LoadTask extends AsyncTask<Long, Void, Event> {
@@ -290,14 +362,23 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
 
         Database mDb;
 
-        UpdateTask(Database mDb) {
+        EventHandler mHandler;
+
+        UpdateTask(Database mDb, EventHandler mHandler) {
             this.mDb = mDb;
+            this.mHandler = mHandler;
         }
 
         @Override
         protected Void doInBackground(Event... params) {
             mDb.updateEvent(params[0]);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
         }
     }
 
@@ -318,4 +399,6 @@ public class DetailEventActivity extends Activity implements IFOnEventFetchListe
             return null;
         }
     }
+
+
 }

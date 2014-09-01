@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapp.AppUtil;
 import com.example.myapp.DetailEventActivity;
@@ -35,11 +37,17 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
 
     private static final String COUNT = "100";
 
+    private static final String TAG = "plan_event";
+
     private Context mContext;
+
+    private TextView mTvAdd;
 
     private EventCategoryAdapter adapter;
 
     private ListView mLvEventList;
+
+    private AddDialogFragment dialog;
 
     private Database mDb;
 
@@ -65,7 +73,36 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
         mLvEventList.setAdapter(adapter);
         mLvEventList.setOnItemClickListener(this);
         mLvEventList.setOnItemLongClickListener(this);
+        mTvAdd = (TextView) view.findViewById(R.id.add_item);
+        mTvAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addItem();
+            }
+        });
         return view;
+    }
+
+    private void addItem() {
+        dialog = new AddDialogFragment(getString(R.string.add_event), new AddDialogFragment.AddDialogListener() {
+            @Override
+            public void onDialogPositiveClick(AddDialogFragment dialog) {
+                Event event;
+                String content = dialog.getContent();
+                if (content != null && content.length() != 0) {
+                    event = new Event(dialog.getContent(), System.currentTimeMillis());
+                    adapter.addEvent(event);
+                    new AddEventTask(mDb).execute(event);
+                } else {
+                    Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onDialogNegativeClick(AddDialogFragment dialog) {
+            }
+        });
+        dialog.show(getFragmentManager(), TAG);
     }
 
     @Override

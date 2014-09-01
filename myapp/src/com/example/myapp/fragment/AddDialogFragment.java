@@ -24,6 +24,8 @@ public class AddDialogFragment extends DialogFragment {
 
     private EditText mEt_content;
 
+    private String content;
+
     private String title;
 
     public AddDialogFragment(String title, AddDialogListener mListener) {
@@ -33,6 +35,14 @@ public class AddDialogFragment extends DialogFragment {
             this.title = "";
         }
         this.mListener = mListener;
+    }
+
+    public void setContent(int resid) {
+        content = getString(resid);
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getContent() {
@@ -48,7 +58,7 @@ public class AddDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_item_dialog, null);
         mEt_content = (EditText) view.findViewById(R.id.content);
-
+        mEt_content.setText(content);
         builder.setView(view)
                 .setTitle(title)
                 .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {

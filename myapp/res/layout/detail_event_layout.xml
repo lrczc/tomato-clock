@@ -23,11 +23,14 @@
             android:text="@string/event_name"
             android:textSize="15sp" />
 
-        <EditText
-            android:id="@+id/et_event_name"
+        <TextView
+            android:id="@+id/tv_event_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp" />
+            android:gravity="center"
+            android:textSize="15sp"
+            android:drawableRight="@android:drawable/ic_menu_edit"
+            android:layout_marginLeft="10dp"/>
 
     </LinearLayout>
 

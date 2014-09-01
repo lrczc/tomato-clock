@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapp.DetailEventActivity;
 import com.example.myapp.MainActivity;
@@ -40,8 +41,6 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
     private ListView mLvEventList;
 
     private EventListAdapter mEventAdapter;
-
-    private List<Event> mEventList = new ArrayList<Event>();
 
     private TextView mTvAdd;
 
@@ -97,21 +96,13 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
             @Override
             public void onDialogPositiveClick(AddDialogFragment dialog) {
                 Event event;
-                if (dialog.getContent() != null) {
+                String content = dialog.getContent();
+                if (content != null && content.length() != 0) {
                     event = new Event(dialog.getContent(), System.currentTimeMillis());
                     mEventAdapter.addEventLast(event);
                     new AddEventTask(mDb).execute(event);
                 } else {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(getString(R.string.error_info))
-                            .setMessage(getString(R.string.add_failed))
-                            .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .create()
-                            .show();
+                    Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
                 }
             }
 
