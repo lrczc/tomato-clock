@@ -32,6 +32,9 @@
                 <action android:name="com.example.myapp.Alarm_Alert"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".AlertReceiver" />
+
+        <service android:name=".DailyService" />
     </application>
 
 </manifest>
