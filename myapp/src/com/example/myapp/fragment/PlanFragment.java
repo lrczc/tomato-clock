@@ -89,8 +89,9 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
             public void onDialogPositiveClick(AddDialogFragment dialog) {
                 Event event;
                 String content = dialog.getContent();
+                long planTime = dialog.getPlanTime();
                 if (content != null && content.length() != 0) {
-                    event = new Event(dialog.getContent(), System.currentTimeMillis());
+                    event = new Event(dialog.getContent(), planTime);
                     adapter.addEvent(event);
                     new AddEventTask(mDb).execute(event);
                 } else {

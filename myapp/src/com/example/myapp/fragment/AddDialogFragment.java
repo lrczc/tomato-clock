@@ -2,6 +2,7 @@ package com.example.myapp.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -10,15 +11,21 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.myapp.AppUtil;
 import com.example.myapp.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by czc on 2014/8/22.
  */
-public class AddDialogFragment extends DialogFragment {
+public class AddDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     private AddDialogListener mListener;
 
@@ -27,6 +34,10 @@ public class AddDialogFragment extends DialogFragment {
     private String content;
 
     private String title;
+
+    private TextView mTvPlanTime;
+
+    private long mPlanTime;
 
     public AddDialogFragment(String title, AddDialogListener mListener) {
         if (title != null) {
@@ -52,13 +63,30 @@ public class AddDialogFragment extends DialogFragment {
         return mEt_content.getText().toString().trim();
     }
 
+    public long getPlanTime() {
+        return mPlanTime;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_item_dialog, null);
+        mPlanTime = System.currentTimeMillis();
         mEt_content = (EditText) view.findViewById(R.id.content);
         mEt_content.setText(content);
+        mTvPlanTime = (TextView) view.findViewById(R.id.plan_time);
+        mTvPlanTime.setText(R.string.today);
+        mTvPlanTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                new DatePickerDialog(getActivity(), AddDialogFragment.this, year, month, day).show();
+            }
+        });
         builder.setView(view)
                 .setTitle(title)
                 .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
@@ -73,6 +101,18 @@ public class AddDialogFragment extends DialogFragment {
                     }
                 });
         return builder.create();
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        Date date = new Date(year-1900, monthOfYear, dayOfMonth);
+        mPlanTime = date.getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (AppUtil.isSameDay(mPlanTime, System.currentTimeMillis())) {
+            mTvPlanTime.setText(R.string.today);
+        } else {
+            mTvPlanTime.setText(AppUtil.timeToString1(mPlanTime, dateFormat));
+        }
     }
 
     public interface AddDialogListener {

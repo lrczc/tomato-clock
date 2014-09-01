@@ -97,12 +97,14 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
             public void onDialogPositiveClick(AddDialogFragment dialog) {
                 Event event;
                 String content = dialog.getContent();
+                long planTime = dialog.getPlanTime();
                 if (content != null && content.length() != 0) {
-                    event = new Event(dialog.getContent(), System.currentTimeMillis());
+                    event = new Event(dialog.getContent(), planTime);
                     mEventAdapter.addEventLast(event);
                     new AddEventTask(mDb).execute(event);
                 } else {
                     Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
+                    return;
                 }
             }
 
