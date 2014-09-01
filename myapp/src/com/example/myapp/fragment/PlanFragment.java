@@ -67,6 +67,17 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        new LoadTask(mDb, COUNT, adapter, inflater).execute();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.plan_fragment_layout, container, false);
         mLvEventList = (ListView) view.findViewById(R.id.event_list);
@@ -109,7 +120,7 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
     @Override
     public void onStart() {
         super.onStart();
-        new LoadTask(mDb, COUNT, adapter, inflater).execute();
+        //new LoadTask(mDb, COUNT, adapter, inflater).execute();
     }
 
     @Override

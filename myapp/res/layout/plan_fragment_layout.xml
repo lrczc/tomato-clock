@@ -8,6 +8,7 @@
         android:drawableTop="@android:drawable/ic_menu_add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/add_button_background"
         android:text="@string/add"
         android:textColor="@android:color/black"
         android:id="@+id/add_item"

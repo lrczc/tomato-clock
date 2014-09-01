@@ -64,6 +64,17 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
     @Override
     public void onStart() {
         super.onStart();
+        //loadlist();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         loadlist();
     }
 
