@@ -113,7 +113,7 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
             @Override
             public void onDialogNegativeClick(AddDialogFragment dialog) {
             }
-        });
+        }, View.VISIBLE);
         dialog.show(getFragmentManager(), TAG);
     }
 
@@ -125,6 +125,8 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        if (adapter.isTitle(position))
+            return true;
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.delete_confirm)
                 .setMessage(R.string.if_delete)

@@ -74,6 +74,12 @@ public class EventCategoryAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public boolean isTitle(int position) {
+        if (getItemViewType(position) == TYPE_SEPARATOR)
+            return true;
+        return false;
+    }
+
     @Override
     public int getCount() {
         int total = 0;

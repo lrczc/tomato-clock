@@ -39,13 +39,16 @@ public class AddDialogFragment extends DialogFragment implements DatePickerDialo
 
     private long mPlanTime;
 
-    public AddDialogFragment(String title, AddDialogListener mListener) {
+    private int planTimeVisable;
+
+    public AddDialogFragment(String title, AddDialogListener mListener, int planTimeVisable) {
         if (title != null) {
             this.title = title;
         } else {
             this.title = "";
         }
         this.mListener = mListener;
+        this.planTimeVisable = planTimeVisable;
     }
 
     public void setContent(int resid) {
@@ -87,6 +90,7 @@ public class AddDialogFragment extends DialogFragment implements DatePickerDialo
                 new DatePickerDialog(getActivity(), AddDialogFragment.this, year, month, day).show();
             }
         });
+        view.findViewById(R.id.plan_time_layout).setVisibility(planTimeVisable);
         builder.setView(view)
                 .setTitle(title)
                 .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {

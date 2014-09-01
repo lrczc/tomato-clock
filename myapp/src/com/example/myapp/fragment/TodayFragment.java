@@ -122,7 +122,7 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
             @Override
             public void onDialogNegativeClick(AddDialogFragment dialog) {
             }
-        });
+        }, View.VISIBLE);
         dialog.show(getFragmentManager(), TAG);
     }
 

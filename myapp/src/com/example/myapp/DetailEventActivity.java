@@ -237,7 +237,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                     @Override
                     public void onDialogNegativeClick(AddDialogFragment dialog) {
                     }
-                });
+                }, View.INVISIBLE);
                 mAddDialog.setContent(mEvent.getEventName());
                 mAddDialog.show(getSupportFragmentManager(), TAG);
             }
