@@ -55,24 +55,22 @@ public class EventCategoryAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public boolean isTitle() {
-        return false;
-    }
-
     public void addEvent(Event event) {
         int size = categories.size();
-        for (int i=0; i<size; i++) {
-            EventCategory category = categories.get(i);
+        int pointer = 0;
+        for (; pointer<size; pointer++) {
+            EventCategory category = categories.get(pointer);
             if (AppUtil.timeToString1(event.getPlanTime(),dateFormat).equals(category.getTitle())) {
                 category.getAdapter().addEventLast(event);
                 notifyDataSetChanged();
                 return;
             } else if (AppUtil.stringToTime(category.getTitle(), dateFormat) > event.getPlanTime()) {
-                EventListAdapter adapter = new EventListAdapter(mInflater);
-                adapter.addEventLast(event);
-                categories.add(i,new EventCategory(AppUtil.timeToString1(event.getPlanTime(),dateFormat), adapter));
+                break;
             }
         }
+        EventListAdapter adapter = new EventListAdapter(mInflater);
+        adapter.addEventLast(event);
+        categories.add(pointer,new EventCategory(AppUtil.timeToString1(event.getPlanTime(),dateFormat), adapter));
         notifyDataSetChanged();
     }
 
