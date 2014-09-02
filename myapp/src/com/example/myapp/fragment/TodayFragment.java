@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/21.
  */
-public class TodayFragment extends Fragment implements ListView.OnItemLongClickListener, ListView.OnItemClickListener {
+public class TodayFragment extends BaseFragment implements ListView.OnItemLongClickListener, ListView.OnItemClickListener {
 
     private String EVENT_COUNT = "50";
 
@@ -41,8 +41,6 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
     private ListView mLvEventList;
 
     private EventListAdapter mEventAdapter;
-
-    private TextView mTvAdd;
 
     private AddDialogFragment dialog;
 
@@ -73,6 +71,16 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            onResume();
+        } else {
+            onPause();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         loadlist();
@@ -91,40 +99,9 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
         mLvEventList.setAdapter(mEventAdapter);
         mLvEventList.setOnItemLongClickListener(this);
         mLvEventList.setOnItemClickListener(this);
-        mTvAdd = (TextView) view.findViewById(R.id.add_item);
-        mTvAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addItem();
-            }
-        });
         return view;
     }
 
-
-    private void addItem() {
-        dialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
-            @Override
-            public void onDialogPositiveClick(AddDialogFragment dialog) {
-                Event event;
-                String content = dialog.getContent();
-                long planTime = dialog.getPlanTime();
-                if (content != null && content.length() != 0) {
-                    event = new Event(dialog.getContent(), planTime);
-                    mEventAdapter.addEventLast(event);
-                    new AddEventTask(mDb).execute(event);
-                } else {
-                    Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-
-            @Override
-            public void onDialogNegativeClick(AddDialogFragment dialog) {
-            }
-        }, View.VISIBLE);
-        dialog.show(getFragmentManager(), TAG);
-    }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -155,6 +132,32 @@ public class TodayFragment extends Fragment implements ListView.OnItemLongClickL
         bundle.putLong("event_id", eventId);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void actionAddEvent() {
+        dialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
+            @Override
+            public void onDialogPositiveClick(AddDialogFragment dialog) {
+                Event event;
+                String content = dialog.getContent();
+                long planTime = dialog.getPlanTime();
+                if (content != null && content.length() != 0) {
+                    event = new Event(dialog.getContent(), planTime);
+                    mEventAdapter.addEventLast(event);
+                    new AddEventTask(mDb).execute(event);
+                    Toast.makeText(getActivity(), R.string.add_success, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            @Override
+            public void onDialogNegativeClick(AddDialogFragment dialog) {
+            }
+        }, View.VISIBLE);
+        dialog.show(getFragmentManager(), TAG);
     }
 
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {

@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/22.
  */
-public class PlanFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class PlanFragment extends BaseFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final String COUNT = "100";
 
@@ -78,19 +77,22 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            onResume();
+        } else {
+            onPause();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.plan_fragment_layout, container, false);
         mLvEventList = (ListView) view.findViewById(R.id.event_list);
         mLvEventList.setAdapter(adapter);
         mLvEventList.setOnItemClickListener(this);
         mLvEventList.setOnItemLongClickListener(this);
-        mTvAdd = (TextView) view.findViewById(R.id.add_item);
-        mTvAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addItem();
-            }
-        });
         return view;
     }
 
@@ -105,6 +107,7 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
                     event = new Event(dialog.getContent(), planTime);
                     adapter.addEvent(event);
                     new AddEventTask(mDb).execute(event);
+                    Toast.makeText(getActivity(), R.string.add_success, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
                 }
@@ -154,6 +157,11 @@ public class PlanFragment extends Fragment implements AdapterView.OnItemClickLis
         bundle.putLong("event_id", eventId);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void actionAddEvent() {
+        addItem();
     }
 
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {

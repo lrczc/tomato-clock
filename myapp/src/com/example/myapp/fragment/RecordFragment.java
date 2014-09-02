@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.myapp.DetailRecordEventActivity;
 import com.example.myapp.MainActivity;
@@ -19,6 +20,7 @@ import com.example.myapp.R;
 import com.example.myapp.adapter.RecordEventListAdapter;
 import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
+import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
 
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
 /**
  * Created by czc on 2014/8/22.
  */
-public class RecordFragment extends Fragment implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
+public class RecordFragment extends BaseFragment implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
     private Context mContext;
 
@@ -35,6 +37,7 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
     private RecordEventListAdapter mEventAdapter;
 
     private Database mDb;
+    private String TAG = "record fragment";
 
     public RecordFragment(Context context) {
         mContext = context;
@@ -49,9 +52,29 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            onResume();
+        } else {
+            onPause();
+        }
+    }
+
+    @Override
     public void onStart() {
-        new LoadTask(mDb, mEventAdapter).execute();
         super.onStart();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        new LoadTask(mDb, mEventAdapter).execute();
+        super.onResume();
     }
 
     @Override
@@ -96,6 +119,33 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
         startActivity(intent);
     }
 
+    private void addItem() {
+        new AddDialogFragment(getString(R.string.add_event), new AddDialogFragment.AddDialogListener() {
+            @Override
+            public void onDialogPositiveClick(AddDialogFragment dialog) {
+                Event event;
+                String content = dialog.getContent();
+                long planTime = dialog.getPlanTime();
+                if (content != null && content.length() != 0) {
+                    event = new Event(dialog.getContent(), planTime);
+                    new AddEventTask(mDb).execute(event);
+                    Toast.makeText(getActivity(), R.string.add_success, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onDialogNegativeClick(AddDialogFragment dialog) {
+            }
+        }, View.VISIBLE).show(getFragmentManager(), TAG);
+    }
+
+    @Override
+    public void actionAddEvent() {
+        addItem();
+    }
+
     static class LoadTask extends AsyncTask<Void, Void, List<RecordEvent>> {
 
         private Database mDb;
@@ -134,4 +184,22 @@ public class RecordFragment extends Fragment implements AdapterView.OnItemLongCl
             return null;
         }
     }
+
+    static class AddEventTask extends AsyncTask<Event, Void, Void> {
+        private Database mDb;
+
+        AddEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Event... params) {
+            int count = params.length;
+            for (int i=0; i<count; i++) {
+                params[i].setEventID(mDb.insertEvent(params[i]));
+            }
+            return null;
+        }
+    }
+
 }
