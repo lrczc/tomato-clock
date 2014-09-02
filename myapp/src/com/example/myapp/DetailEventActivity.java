@@ -3,7 +3,6 @@ package com.example.myapp;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,16 +17,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapp.animator.Techniques;
+import com.example.myapp.animator.YoYo;
 import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.fragment.AddDialogFragment;
 import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
+import com.nineoldandroids.animation.Animator;
+
+import mirko.android.datetimepicker.date.DatePickerDialog;
+import mirko.android.datetimepicker.date.DatePickerDialog.OnDateSetListener;
 
 import java.lang.ref.SoftReference;
 import java.text.SimpleDateFormat;
@@ -49,19 +55,21 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     private TextView mTvPlanTime, mTvRealTime;
 
+    private ImageButton mBtnPlanTime, mBtnEventName;
+
     private ArrayAdapter<String> mTimeAdapter, mSoundAdapter;
 
     private ImageView mBtnStartEvent;
 
     private TomatoOpenHelper mOpenHelper;
 
+    private YoYo.YoYoString rope;
+
     private long startTime;
 
     private boolean starting = false;
 
     private Database mDb;
-
-    private DatePickerDialog mDatePickerDialog;
 
     private AddDialogFragment mAddDialog;
 
@@ -89,7 +97,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
     }
 
     @Override
-    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
         Date date = new Date(year-1900, monthOfYear, dayOfMonth);
         mEvent.setPlanTime(date.getTime());
         new UpdateTask(mDb, mHandler).execute(mEvent);
@@ -133,8 +141,31 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                         mTvRealTime.setText(realTime);
                         sendEmptyMessageDelayed(MSG_UPDATE_TIME, DELAY_TIME);
                     } else {
+                        starting = false;
                         new CompleteTask(mDb).execute(mEvent);
-                        finish();
+                        mTvRealTime.setText(R.string.initial_real_time);
+                        rope = YoYo.with(Techniques.Swing).duration(1000)
+                                .withListener(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animation) {
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        //TODO start() 重复计数
+                                        //finish();
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animation) {
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animation) {
+                                    }
+                                })
+                                .playOn(mTvRealTime);
+                        //finish();
                     }
                     break;
                 }
@@ -152,6 +183,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
         mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
         mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+        rope = YoYo.with(Techniques.Shake).duration(1000).playOn(mTvRealTime);
     }
 
     @Override
@@ -223,7 +255,8 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
             }
         });
         mTvEventName = (TextView) findViewById(R.id.tv_event_name);
-        mTvEventName.setOnClickListener(new View.OnClickListener() {
+        mBtnEventName = (ImageButton) findViewById(R.id.btnChangeName);
+        mBtnEventName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mAddDialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
@@ -244,15 +277,16 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         });
         mTvRealTime = (TextView) findViewById(R.id.real_time);
         mTvPlanTime = (TextView) findViewById(R.id.plan_time);
-        mTvPlanTime.setOnClickListener(new View.OnClickListener() {
+        mBtnPlanTime = (ImageButton) findViewById(R.id.btnChangeDate);
+        mBtnPlanTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                mDatePickerDialog = new DatePickerDialog(DetailEventActivity.this, DetailEventActivity.this, year, month, day);
-                mDatePickerDialog.show();
+                final DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(DetailEventActivity.this,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show(getFragmentManager(), TAG);
             }
         });
         mSpEventTime = (Spinner) findViewById(R.id.time_picker);

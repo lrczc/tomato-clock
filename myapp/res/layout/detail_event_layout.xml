@@ -8,29 +8,49 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
+        android:divider="?android:attr/dividerHorizontal"
+        android:dividerPadding="5dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
-        <TextView
-            android:id="@+id/event_name_title"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_name"
-            android:textSize="15sp" />
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/tv_event_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textSize="15sp"
-            android:drawableRight="@android:drawable/ic_menu_edit"
-            android:layout_marginLeft="10dp"/>
+            <TextView
+                android:id="@+id/event_name_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/event_name"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_event_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnChangeName"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_edit" />
 
     </LinearLayout>
 
@@ -64,23 +84,47 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
-        android:gravity="center_vertical">
+        android:divider="?android:attr/dividerHorizontal"
+        android:dividerPadding="5dp"
+        android:gravity="center_vertical"
+        android:showDividers="middle">
 
-        <TextView
-            android:id="@+id/plan_time_picker_title"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/set_plan_time"
-            android:textSize="15dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/plan_time"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:gravity="center"
-            android:textSize="15dp"
-            android:drawableRight="@android:drawable/ic_menu_edit" />
+            <TextView
+                android:id="@+id/plan_time_picker_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="@string/set_plan_time"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/plan_time"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-light"
+                android:paddingLeft="5dp"
+                android:text="Date here!"
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnChangeDate"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_date"
+            android:tint="@android:color/darker_gray" />
     </LinearLayout>
 
     <LinearLayout
@@ -106,17 +150,18 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/btn_start"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginTop="10dp"
-        android:src="@android:drawable/ic_media_play"
-        android:id="@+id/btn_start"/>
+        android:src="@android:drawable/ic_media_play" />
+
     <TextView
-        android:layout_marginTop="10dp"
+        android:id="@+id/real_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/real_time"
-        android:text="00:00:000"
-        android:textSize="60sp"/>
+        android:layout_marginTop="10dp"
+        android:text="@string/initial_real_time"
+        android:textSize="60sp" />
 
 </LinearLayout>
