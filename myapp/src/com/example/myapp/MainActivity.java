@@ -91,8 +91,9 @@ public class MainActivity extends FragmentActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
+        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
         tabBarView.setViewPager(mViewPager);
+
 
 //        mRG = (RadioGroup) findViewById(R.id.tabs_rg);
 //        mTabAdapter = new FragmentTabAdapter(this, mFragments, R.id.tab_content, mRG);
