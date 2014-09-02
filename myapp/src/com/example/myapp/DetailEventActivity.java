@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,7 +15,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -32,18 +30,17 @@ import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
 import com.nineoldandroids.animation.Animator;
 
-import mirko.android.datetimepicker.date.DatePickerDialog;
-import mirko.android.datetimepicker.date.DatePickerDialog.OnDateSetListener;
-
 import java.lang.ref.SoftReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import mirko.android.datetimepicker.date.DatePickerDialog;
+
 /**
  * Created by shizhao.czc on 2014/8/26.
  */
-public class DetailEventActivity extends FragmentActivity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener {
+public class DetailEventActivity extends FragmentActivity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener, Animator.AnimatorListener {
 
     private static final String TAG = "detail event";
 
@@ -53,7 +50,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     private Spinner mSpEventTime, mSpSound;
 
-    private TextView mTvPlanTime, mTvRealTime;
+    private TextView mTvPlanTime, mTvRealTime, mTvEndInfo;
 
     private ImageButton mBtnPlanTime, mBtnEventName;
 
@@ -77,8 +74,6 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     public static final int MSG_UPDATE_TIME = 0x02;
 
-    public static final int MSG_NOTTODAY = 0x03;
-
     static final int DELAY_TIME = 100;
 
     private EventHandler mHandler;
@@ -98,9 +93,29 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        Date date = new Date(year-1900, monthOfYear, dayOfMonth);
+        Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
         mEvent.setPlanTime(date.getTime());
         new UpdateTask(mDb, mHandler).execute(mEvent);
+    }
+
+    @Override
+    public void onAnimationStart(Animator animator) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animator) {
+        animator.start();
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animator) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animator) {
+
     }
 
     class EventHandler extends Handler {
@@ -113,9 +128,9 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
         @Override
         public void handleMessage(Message msg) {
-            SimpleDateFormat dateFormat1=new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat dateFormat2 = new SimpleDateFormat("mm:ss:SSS");
-            long totalTime = AppUtil.TIME[mEvent.getTime()]*60000;
+            long totalTime = AppUtil.TIME[mEvent.getTime()] * 60000;
             switch (msg.what) {
                 case MSG_UPDATE_EVENT: {
                     mTvEventName.setText(mEvent.getEventName());
@@ -135,37 +150,13 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                     break;
                 }
                 case MSG_UPDATE_TIME: {
-                    long remain_time = totalTime-(System.currentTimeMillis()-startTime);
+                    long remain_time = totalTime - (System.currentTimeMillis() - startTime);
                     if (remain_time > 0) {
                         String realTime = dateFormat2.format(new Date(remain_time));
                         mTvRealTime.setText(realTime);
                         sendEmptyMessageDelayed(MSG_UPDATE_TIME, DELAY_TIME);
                     } else {
-                        starting = false;
-                        new CompleteTask(mDb).execute(mEvent);
-                        mTvRealTime.setText(R.string.initial_real_time);
-                        rope = YoYo.with(Techniques.Swing).duration(1000)
-                                .withListener(new Animator.AnimatorListener() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) {
-                                    }
-
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        //TODO start() 重复计数
-                                        //finish();
-                                    }
-
-                                    @Override
-                                    public void onAnimationCancel(Animator animation) {
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animator animation) {
-                                    }
-                                })
-                                .playOn(mTvRealTime);
-                        //finish();
+                        endClock();
                     }
                     break;
                 }
@@ -175,6 +166,10 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     private void startClock() {
         starting = true;
+        mBtnEventName.setEnabled(false);
+        mBtnPlanTime.setEnabled(false);
+        mSpEventTime.setEnabled(false);
+        mSpSound.setEnabled(false);
         Calendar calendar = Calendar.getInstance();
         startTime = System.currentTimeMillis();
         calendar.setTimeInMillis(startTime);
@@ -184,6 +179,21 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
         mHandler.sendEmptyMessage(MSG_UPDATE_TIME);
         rope = YoYo.with(Techniques.Shake).duration(1000).playOn(mTvRealTime);
+    }
+
+    private void endClock() {
+        starting = false;
+        new CompleteTask(mDb).execute(mEvent);
+        mTvRealTime.setText(R.string.initial_real_time);
+        mBtnEventName.setEnabled(false);
+        mBtnStartEvent.setEnabled(false);
+        mBtnPlanTime.setEnabled(false);
+        mSpEventTime.setEnabled(false);
+        mSpSound.setEnabled(false);
+        mTvEndInfo.setVisibility(View.VISIBLE);
+        rope = YoYo.with(Techniques.Swing).duration(1000)
+                .withListener(this)
+                .playOn(mTvRealTime);
     }
 
     @Override
@@ -201,6 +211,8 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         Intent intent = getIntent();
         long eventId = intent.getExtras().getLong("event_id");
         new LoadTask(mDb, this).execute(eventId);
+
+        mTvEndInfo = (TextView) findViewById(R.id.end_msg);
 
         mBtnStartEvent = (ImageView) findViewById(R.id.btn_start);
         mBtnStartEvent.setOnClickListener(new View.OnClickListener() {
@@ -237,6 +249,10 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                             .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    mBtnEventName.setEnabled(true);
+                                    mBtnPlanTime.setEnabled(true);
+                                    mSpEventTime.setEnabled(true);
+                                    mSpSound.setEnabled(true);
                                     starting = false;
                                     mAlarmManager.cancel(pIntent);
                                     mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
@@ -323,6 +339,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                     mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }

@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="15sp"
+        android:maxLines="1"
         android:id="@+id/title"/>
 
     <TextView

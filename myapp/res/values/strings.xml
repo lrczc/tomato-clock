@@ -34,5 +34,6 @@
     <string name="if_delete">是否删除？</string>
     <string name="comment">评论</string>
     <string name="grade">评分</string>
+    <string name="times_up">时间到！</string>
     <string name="initial_real_time">00:00:000</string>
 </resources>
