@@ -19,15 +19,17 @@ public class AlarmReceiver extends BroadcastReceiver {
     public static final String ALARM_ALERT_ACTION = "com.example.myapp.Alarm_Alert";
     @Override
     public void onReceive(Context context, Intent intent) {
-        int soundRes = intent.getIntExtra("sound_res", R.raw.sound1);
-        sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 100);
-        sp.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                soundPool.play(sampleId, 1, 1, 0, 5, 1);
-            }
-        });
-        soundId = sp.load(context, soundRes, 1);
-        Toast.makeText(context, R.string.mission_complete, Toast.LENGTH_SHORT).show();
+        if (intent.getAction() == ALARM_ALERT_ACTION) {
+            int soundRes = intent.getIntExtra("sound_res", R.raw.sound1);
+            sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 100);
+            sp.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                @Override
+                public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                    soundPool.play(sampleId, 1, 1, 0, 5, 1);
+                }
+            });
+            soundId = sp.load(context, soundRes, 1);
+            Toast.makeText(context, R.string.mission_complete, Toast.LENGTH_SHORT).show();
+        }
     }
 }
