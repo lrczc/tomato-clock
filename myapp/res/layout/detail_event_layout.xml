@@ -40,7 +40,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:gravity="center"
+                android:gravity="right"
                 android:textColor="@android:color/holo_blue_light"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -61,20 +61,47 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
-        android:gravity="center_vertical">
+        android:divider="?android:attr/dividerHorizontal"
+        android:dividerPadding="5dp"
+        android:gravity="center_vertical"
+        android:showDividers="middle">
 
-        <TextView
-            android:id="@+id/time_picker_title"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/set_time"
-            android:textSize="15dp" />
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:gravity="center">
 
-        <Spinner
-            android:id="@+id/time_picker"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/time_picker_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="@string/set_time"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-light"
+                android:paddingLeft="5dp"
+                android:text="Time here!"
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnChangeTime"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"></Spinner>
+            android:src="@drawable/ic_time"
+            android:tint="@android:color/darker_gray" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,7 +136,7 @@
                 android:id="@+id/plan_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:gravity="right"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
                 android:paddingLeft="5dp"

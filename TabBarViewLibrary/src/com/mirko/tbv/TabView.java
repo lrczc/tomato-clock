@@ -71,7 +71,10 @@ public class TabView extends LinearLayout {
 
     public void setText(CharSequence text, int ico) {
         mTextView.setText(text);
-		mTextView.setCompoundDrawablesWithIntrinsicBounds(ico, 0, 0, 0);;
+		mTextView.setCompoundDrawablesWithIntrinsicBounds(ico, 0, 0, 0);
     }
 
+    public void setText(CharSequence text) {
+        mTextView.setText(text);
+    }
 }

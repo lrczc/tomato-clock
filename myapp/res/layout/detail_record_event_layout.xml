@@ -26,8 +26,8 @@
         <TextView
             android:id="@+id/event_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:gravity="right"
             android:layout_marginLeft="10dp" />
 
     </LinearLayout>
@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:gravity="center"
+            android:gravity="right"
             android:textSize="15dp" />
     </LinearLayout>
 
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
-            android:gravity="center"
+            android:gravity="right"
             android:textSize="15dp" />
     </LinearLayout>
 
@@ -118,7 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:gravity="center"
+            android:gravity="right"
             android:textSize="15sp" />
     </LinearLayout>
 

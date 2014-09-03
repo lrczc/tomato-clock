@@ -200,8 +200,8 @@ public class TabBarView extends LinearLayout {
 	private void addTabViewL(final int i, String string, int pageIconResId) {
 		// TODO Auto-generated method stub
 		TabView tab = new TabView(getContext());
+        tab.setText(string, pageIconResId);
 		//tab.setIcon(pageIconResId);
-		tab.setText(string, pageIconResId);
 		tab.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -216,7 +216,7 @@ public class TabBarView extends LinearLayout {
 	private void addTabViewP(final int i, final String string, int pageIconResId) {
 		// TODO Auto-generated method stub
 		final TabView tab = new TabView(getContext());
-        tab.setText(string, pageIconResId);
+        tab.setText(string);
 		tab.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

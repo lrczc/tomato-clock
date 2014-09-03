@@ -51,7 +51,7 @@ public class DetailRecordEventActivity extends Activity implements IFOnRecordEve
             switch (msg.what) {
                 case MSG_UPDATE_EVENT: {
                     mTvEventName.setText(mRecordEvent.getEventName());
-                    mTvTime.setText(AppUtil.TIME_TITLE[mRecordEvent.getTime()]);
+                    mTvTime.setText(mRecordEvent.getTime()+getString(R.string.minute));
                     String completeTime = dateFormat1.format(new Date(mRecordEvent.getCompleteTime()));
                     String today = dateFormat1.format(new Date());
                     if (today.equals(completeTime)) {

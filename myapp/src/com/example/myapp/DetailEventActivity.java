@@ -36,6 +36,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import mirko.android.datetimepicker.date.DatePickerDialog;
+import mirko.android.datetimepicker.time.RadialPickerLayout;
+import mirko.android.datetimepicker.time.TimePickerDialog;
 
 /**
  * Created by shizhao.czc on 2014/8/26.
@@ -48,13 +50,13 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     private Event mEvent;
 
-    private Spinner mSpEventTime, mSpSound;
+    private Spinner mSpSound;
 
-    private TextView mTvPlanTime, mTvRealTime, mTvEndInfo;
+    private TextView mTvPlanTime, mTvRealTime, mTvEndInfo, mTvTime;
 
-    private ImageButton mBtnPlanTime, mBtnEventName;
+    private ImageButton mBtnPlanTime, mBtnEventName, mBtnTime;
 
-    private ArrayAdapter<String> mTimeAdapter, mSoundAdapter;
+    private ArrayAdapter<String> mSoundAdapter;
 
     private ImageView mBtnStartEvent;
 
@@ -130,11 +132,13 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         public void handleMessage(Message msg) {
             SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat dateFormat2 = new SimpleDateFormat("mm:ss:SSS");
-            long totalTime = AppUtil.TIME[mEvent.getTime()] * 60000;
+            long totalTime = mEvent.getTime() * 60000;
             switch (msg.what) {
                 case MSG_UPDATE_EVENT: {
                     mTvEventName.setText(mEvent.getEventName());
-                    mSpEventTime.setSelection(mEvent.getTime(), true);
+                    if (mEvent.getTime() > 0) {
+                        mTvTime.setText(mEvent.getTime() + getString(R.string.minute));
+                    } else mTvTime.setText(R.string.not_set_time);
                     mSpSound.setSelection(mEvent.getSound(), true);
                     String planTime = dateFormat1.format(new Date(mEvent.getPlanTime()));
                     String today = dateFormat1.format(new Date());
@@ -168,12 +172,12 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         starting = true;
         mBtnEventName.setEnabled(false);
         mBtnPlanTime.setEnabled(false);
-        mSpEventTime.setEnabled(false);
+        mBtnTime.setEnabled(false);
         mSpSound.setEnabled(false);
         Calendar calendar = Calendar.getInstance();
         startTime = System.currentTimeMillis();
         calendar.setTimeInMillis(startTime);
-        calendar.add(Calendar.MINUTE, AppUtil.TIME[mEvent.getTime()]);
+        calendar.add(Calendar.MINUTE, mEvent.getTime());
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
         //mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pIntent);
         mBtnStartEvent.setImageResource(android.R.drawable.ic_media_pause);
@@ -188,7 +192,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         mBtnEventName.setEnabled(false);
         mBtnStartEvent.setEnabled(false);
         mBtnPlanTime.setEnabled(false);
-        mSpEventTime.setEnabled(false);
+        mBtnTime.setEnabled(false);
         mSpSound.setEnabled(false);
         mTvEndInfo.setVisibility(View.VISIBLE);
         rope = YoYo.with(Techniques.Swing).duration(1000)
@@ -251,7 +255,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                                 public void onClick(DialogInterface dialog, int which) {
                                     mBtnEventName.setEnabled(true);
                                     mBtnPlanTime.setEnabled(true);
-                                    mSpEventTime.setEnabled(true);
+                                    mBtnTime.setEnabled(true);
                                     mSpSound.setEnabled(true);
                                     starting = false;
                                     mAlarmManager.cancel(pIntent);
@@ -305,29 +309,29 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
                 datePickerDialog.show(getFragmentManager(), TAG);
             }
         });
-        mSpEventTime = (Spinner) findViewById(R.id.time_picker);
-        mTimeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, AppUtil.TIME_TITLE);
-        mTimeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpEventTime.setAdapter(mTimeAdapter);
-        mSpEventTime.setSelection(0, true);
-        mSpEventTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mEvent.getTime() != position) {
-                    mEvent.setTime(position);
-                    new UpdateTask(mDb, mHandler).execute(mEvent);
-                }
-            }
 
+        mTvTime = (TextView) findViewById(R.id.time);
+        mBtnTime = (ImageButton) findViewById(R.id.btnChangeTime);
+        mBtnTime.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onClick(View v) {
+                TimePickerDialog dialog = new TimePickerDialog();
+                dialog.initialize(new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+                        if (mEvent.getTime() != minute) {
+                            mEvent.setTime(minute);
+                            new UpdateTask(mDb, mHandler).execute(mEvent);
+                        }
+                    }
+                }, 1, 0, true);
+                dialog.show(getFragmentManager(), "tag");
             }
         });
-        mSpEventTime.setVisibility(View.VISIBLE);
 
         mSpSound = (Spinner) findViewById(R.id.sound_picker);
-        mSoundAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, AppUtil.SOUND_TITLE);
-        mSoundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSoundAdapter = new ArrayAdapter<String>(this, R.layout.sound_spinner_item, AppUtil.SOUND_TITLE);
+        mSoundAdapter.setDropDownViewResource(R.layout.sound_spinner_dropdown_item);
         mSpSound.setAdapter(mSoundAdapter);
         mSpSound.setSelection(0, true);
         mSpSound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

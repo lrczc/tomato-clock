@@ -80,6 +80,7 @@ public class EventListAdapter extends BaseAdapter {
         private TextView subtitle;
 
         private static String NO_TIME = "未设置时间";
+        private static String MINUTE = "分钟";
 
         private ViewHolder(View view) {
             view.setTag(this);
@@ -99,7 +100,7 @@ public class EventListAdapter extends BaseAdapter {
         public void render(Event event) {
             title.setText(event.getEventName());
             if (event.getTime() != 0) {
-                subtitle.setText(AppUtil.TIME_TITLE[event.getTime()]);
+                subtitle.setText(event.getTime()+MINUTE);
             } else {
                 subtitle.setText(NO_TIME);
             }

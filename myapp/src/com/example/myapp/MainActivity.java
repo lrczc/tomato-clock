@@ -3,7 +3,6 @@ package com.example.myapp;
 import android.app.ActionBar;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,9 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RadioGroup;
 
-import com.example.myapp.adapter.FragmentTabAdapter;
 import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.fragment.BaseFragment;
 import com.example.myapp.fragment.PlanFragment;
@@ -26,13 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mirko.android.datetimepicker.time.RadialPickerLayout;
+import mirko.android.datetimepicker.time.TimePickerDialog;
+
 public class MainActivity extends FragmentActivity {
 
     private TabBarView tabBarView;
 
     SectionsPagerAdapter mSectionsPagerAdapter;
 
-//    private RadioGroup mRG;
+    //    private RadioGroup mRG;
     private List<BaseFragment> mFragments = new ArrayList<BaseFragment>();
 
     //private FragmentTabAdapter mTabAdapter;
@@ -59,9 +59,10 @@ public class MainActivity extends FragmentActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_add) {
-            mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem()).actionAddEvent();
-            return true;
+        switch (id) {
+            case R.id.action_add:
+                mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem()).actionAddEvent();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -71,28 +72,26 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_ui);
 
-        LayoutInflater inflator =
-                (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        View v = inflator.inflate(R.layout.custom_ab, null);
-        tabBarView = (TabBarView) v.findViewById(R.id.tab_bar);
-
-        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getActionBar().setCustomView(v);
-
-        mOpenHelper = new TomatoOpenHelper(getApplicationContext());
-
+        LayoutInflater inflator = getLayoutInflater();
         mFragments.add(new TodayFragment(this));
         mFragments.add(new PlanFragment(this));
         mFragments.add(new RecordFragment(this));
 
-
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), mFragments);
 
+        View v = inflator.inflate(R.layout.custom_ab, null);
+        tabBarView = (TabBarView) v.findViewById(R.id.tab_bar);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
         tabBarView.setViewPager(mViewPager);
+
+        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getActionBar().setCustomView(v);
+
+
+        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
+
+        mOpenHelper = new TomatoOpenHelper(getApplicationContext());
 
 
 //        mRG = (RadioGroup) findViewById(R.id.tabs_rg);
@@ -108,7 +107,7 @@ public class MainActivity extends FragmentActivity {
     public class SectionsPagerAdapter extends FragmentPagerAdapter implements TabBarView.IconTabProvider {
         private List<BaseFragment> fragments;
 
-        private int[] tab_icons={android.R.drawable.star_off,
+        private int[] tab_icons = {android.R.drawable.star_off,
                 android.R.drawable.star_off,
                 android.R.drawable.star_off,
         };

@@ -61,6 +61,8 @@
     <!-- DO NOT TRANSLATE -->
     <string name="time_separator">:</string>
 
+    <string name="minute">分钟</string>
+
     <!-- DO NOT TRANSLATE -->
     <string name="radial_numbers_typeface">sans-serif</string>
     <!-- DO NOT TRANSLATE -->
