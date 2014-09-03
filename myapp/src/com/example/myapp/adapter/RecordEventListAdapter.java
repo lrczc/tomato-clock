@@ -87,7 +87,7 @@ public class RecordEventListAdapter extends BaseAdapter {
         } else {
             viewHolder = ViewHolder.getFromView(convertView);
         }
-        viewHolder.render(getItem(position));
+        viewHolder.render(getItem(position), position);
         return convertView;
     }
 
@@ -112,11 +112,9 @@ public class RecordEventListAdapter extends BaseAdapter {
             }
         }
 
-        public void render(RecordEvent event) {
-            char c = event.getEventName().charAt(0);
-            if (Character.isLowerCase(c))
-                c = Character.toUpperCase(c);
-            mLetterIV.setLetter(c);
+        public void render(RecordEvent event, int position) {
+            mLetterIV.setText(String.valueOf(event.getTime()));
+            mLetterIV.setPosition(position);
             title.setText(event.getEventName());
             SimpleDateFormat dateFormat1=new SimpleDateFormat("yyyy-MM-dd");
             String str = "完成日期：" + dateFormat1.format(new Date(event.getCompleteTime()));

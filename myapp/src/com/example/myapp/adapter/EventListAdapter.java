@@ -72,7 +72,7 @@ public class EventListAdapter extends BaseAdapter {
         } else {
             viewHolder = ViewHolder.getFromView(convertView);
         }
-        viewHolder.render(getItem(position));
+        viewHolder.render(getItem(position), position);
         return convertView;
     }
 
@@ -100,12 +100,10 @@ public class EventListAdapter extends BaseAdapter {
             }
         }
 
-        public void render(Event event) {
+        public void render(Event event, int position) {
             //mLetterIV.setOval(true);
-            char c = event.getEventName().charAt(0);
-            if (Character.isLowerCase(c))
-                c = Character.toUpperCase(c);
-            mLetterIV.setLetter(c);
+            mLetterIV.setText(String.valueOf(event.getTime()));
+            mLetterIV.setPosition(position);
             title.setText(event.getEventName());
             if (event.getTime() != 0) {
                 subtitle.setText(event.getTime()+MINUTE);

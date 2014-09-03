@@ -14,11 +14,12 @@ import java.util.Random;
 
 public class LetterImageView extends ImageView {
 
-    private char mLetter;
+    private String mText;
     private Paint mTextPaint;
     private Paint mBackgroundPaint;
     private int mTextColor = Color.WHITE;
     private boolean isOval;
+    private int position;
 
     public LetterImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -30,15 +31,23 @@ public class LetterImageView extends ImageView {
         mTextPaint.setColor(mTextColor);
         mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBackgroundPaint.setStyle(Paint.Style.FILL);
-        mBackgroundPaint.setColor(randomColor());
     }
 
-    public char getLetter() {
-        return mLetter;
+    public int getPosition() {
+        return position;
     }
 
-    public void setLetter(char letter) {
-        mLetter = letter;
+    public void setPosition(int position) {
+        this.position = position;
+        invalidate();
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text + "'";
         invalidate();
     }
 
@@ -65,7 +74,8 @@ public class LetterImageView extends ImageView {
 
         if (getDrawable() == null) {
             // Set a text font size based on the height of the view
-            mTextPaint.setTextSize(canvas.getHeight() - getTextPadding() * 2);
+            mBackgroundPaint.setColor(orderColor(position));
+            mTextPaint.setTextSize((canvas.getHeight() - getTextPadding() * 2) * 0.8f);
             if (isOval()) {
                 canvas.drawCircle(canvas.getWidth() / 2f, canvas.getHeight() / 2f, Math.min(canvas.getWidth(), canvas.getHeight()) / 2f,
                         mBackgroundPaint);
@@ -74,13 +84,12 @@ public class LetterImageView extends ImageView {
             }
             // Measure a text
             Rect textBounds = new Rect();
-            mTextPaint.getTextBounds(String.valueOf(mLetter), 0, 1, textBounds);
-            //float textWidth = mTextPaint.measureText(String.valueOf(mLetter));
-            float textWidth = mTextPaint.measureText(String.valueOf(mLetter));
+            mTextPaint.getTextBounds(mText, 0, mText.length(), textBounds);
+            mTextPaint.setTextAlign(Paint.Align.CENTER);
+            float textWidth = mTextPaint.measureText(mText);
             float textHeight = textBounds.height();
             // Draw the text
-            mTextPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(String.valueOf(mLetter), canvas.getWidth() / 2f,
+            canvas.drawText(mText, canvas.getWidth() / 2f,
                     canvas.getHeight() / 2f + textHeight / 2f, mTextPaint);
         }
     }
@@ -88,6 +97,11 @@ public class LetterImageView extends ImageView {
     private float getTextPadding() {
         // Set a default padding to 8dp
         return 8 * getResources().getDisplayMetrics().density;
+    }
+
+    private int orderColor(int position) {
+        String[] colorsArr = getResources().getStringArray(R.array.colors);
+        return Color.parseColor(colorsArr[position % colorsArr.length]);
     }
 
     private int randomColor() {
