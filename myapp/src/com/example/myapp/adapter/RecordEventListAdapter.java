@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.example.myapp.AppUtil;
 import com.example.myapp.R;
 import com.example.myapp.model.RecordEvent;
+import com.example.myapp.widget.LetterImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -93,11 +94,13 @@ public class RecordEventListAdapter extends BaseAdapter {
     private static class ViewHolder {
         private TextView title;
         private TextView subtitle;
+        private LetterImageView mLetterIV;
 
         private ViewHolder(View view) {
             view.setTag(this);
             title = (TextView) view.findViewById(R.id.title);
             subtitle = (TextView) view.findViewById(R.id.subtitle);
+            mLetterIV = (LetterImageView) view.findViewById(R.id.iv_avatar);
         }
 
         public static ViewHolder getFromView(View view) {
@@ -110,6 +113,10 @@ public class RecordEventListAdapter extends BaseAdapter {
         }
 
         public void render(RecordEvent event) {
+            char c = event.getEventName().charAt(0);
+            if (Character.isLowerCase(c))
+                c = Character.toUpperCase(c);
+            mLetterIV.setLetter(c);
             title.setText(event.getEventName());
             SimpleDateFormat dateFormat1=new SimpleDateFormat("yyyy-MM-dd");
             String str = "完成日期：" + dateFormat1.format(new Date(event.getCompleteTime()));
