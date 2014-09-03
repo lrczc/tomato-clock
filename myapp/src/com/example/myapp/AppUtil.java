@@ -14,6 +14,10 @@ public class AppUtil {
 
     public static final int[] SOUND = {R.raw.sound1, R.raw.sound2};
 
+    public static final long REPEAT_INTERVAL = DAY_TIME;
+
+    public static final int ALERT_HOUR = 8;
+
     public static String timeToString1(long time, SimpleDateFormat dateFormat) {
         return dateFormat.format(new Date(time));
     }

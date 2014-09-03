@@ -19,7 +19,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public static final String ALARM_ALERT_ACTION = "com.example.myapp.Alarm_Alert";
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction() == ALARM_ALERT_ACTION) {
+        if (intent.getAction().equals(ALARM_ALERT_ACTION)) {
             int soundRes = intent.getIntExtra("sound_res", R.raw.sound1);
             sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 100);
             sp.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {

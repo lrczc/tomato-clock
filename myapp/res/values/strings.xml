@@ -37,4 +37,6 @@
     <string name="grade">评分</string>
     <string name="times_up">时间到！</string>
     <string name="initial_real_time">00:00:000</string>
+    <string name="alert_title">番茄钟提醒</string>
+    <string name="alert_message">今日有任务，请及时完成。</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.example.myapp;
 
 import android.app.ActionBar;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +23,7 @@ import com.example.myapp.fragment.TodayFragment;
 import com.mirko.tbv.TabBarView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,6 +44,8 @@ public class MainActivity extends FragmentActivity {
     private TomatoOpenHelper mOpenHelper;
 
     private ViewPager mViewPager;
+
+    private AlarmManager mAlarmManager;
 
     public TomatoOpenHelper getOpenHelper() {
         return mOpenHelper;
@@ -89,10 +95,21 @@ public class MainActivity extends FragmentActivity {
         getActionBar().setCustomView(v);
 
 
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent broadcastIntent = new Intent(AlertReceiver.DAILY_ALERT_ACTION);
+        PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
+        Calendar calendar = Calendar.getInstance();
+        //calendar.add(Calendar.SECOND, 10);
+        if (calendar.get(Calendar.HOUR) > AppUtil.ALERT_HOUR) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        calendar.set(Calendar.HOUR, AppUtil.ALERT_HOUR);
+        calendar.set(Calendar.MINUTE, 0);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AppUtil.REPEAT_INTERVAL, pIntent);
+        //mAlarmManager.cancel(pIntent);
         //mViewPager.setPageTransformer(true, new DepthPageTransformer());
 
         mOpenHelper = new TomatoOpenHelper(getApplicationContext());
-
 
 //        mRG = (RadioGroup) findViewById(R.id.tabs_rg);
 //        mTabAdapter = new FragmentTabAdapter(this, mFragments, R.id.tab_content, mRG);

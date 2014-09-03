@@ -33,6 +33,12 @@ public class Database {
         return mOpenHelper.getReadableDatabase();
     }
 
+    public boolean existTodayEvent() {
+        List<Event> list = getTodayEvents("1");
+        if (list.size() > 0) return true;
+        return false;
+    }
+
     public Event getEvent(long id) {
         String[] eventColumns = new String[] {
                 EventColumns._ID, EventColumns.EVENT_NAME, EventColumns.TIME, EventColumns.SOUND, EventColumns.PLAN_TIME, EventColumns.CREATE_TIME
