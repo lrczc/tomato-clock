@@ -13,6 +13,8 @@ import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -166,6 +168,10 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     @Override
     public void onClick(View v) {
+        rope = YoYo.with(Techniques.Pulse)
+                .duration(800)
+                .interpolate(new AccelerateInterpolator())
+                .playOn(v);
         switch (v.getId()) {
             case R.id.btn_start: {
                 if (!starting) {

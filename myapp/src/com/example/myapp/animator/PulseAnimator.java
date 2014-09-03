@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -25,25 +24,16 @@
 
 package com.example.myapp.animator;
 
-public enum Techniques {
+import android.view.View;
 
-    Shake(ShakeAnimator.class),
-    Swing(SwingAnimator.class),
-    Pulse(PulseAnimator.class);
+import com.nineoldandroids.animation.ObjectAnimator;
 
-
-
-    private Class animatorClazz;
-
-    private Techniques(Class clazz) {
-        animatorClazz = clazz;
-    }
-
-    public BaseViewAnimator getAnimator() {
-        try {
-            return (BaseViewAnimator) animatorClazz.newInstance();
-        } catch (Exception e) {
-            throw new Error("Can not init animatorClazz instance");
-        }
+public class PulseAnimator extends BaseViewAnimator {
+    @Override
+    public void prepare(View target) {
+        getAnimatorAgent().playTogether(
+                ObjectAnimator.ofFloat(target, "scaleY", 1, 1.2f, 1),
+                ObjectAnimator.ofFloat(target, "scaleX", 1, 1.2f, 1)
+        );
     }
 }
