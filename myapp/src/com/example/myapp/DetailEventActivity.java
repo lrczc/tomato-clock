@@ -42,7 +42,7 @@ import mirko.android.datetimepicker.time.TimePickerDialog;
 /**
  * Created by shizhao.czc on 2014/8/26.
  */
-public class DetailEventActivity extends FragmentActivity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener, Animator.AnimatorListener {
+public class DetailEventActivity extends FragmentActivity implements IFOnEventFetchListener, DatePickerDialog.OnDateSetListener, Animator.AnimatorListener, View.OnClickListener {
 
     private static final String TAG = "detail event";
 
@@ -117,6 +117,113 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     @Override
     public void onAnimationRepeat(Animator animator) {
+
+    }
+
+    private void switchToToday() {
+        new AlertDialog.Builder(DetailEventActivity.this)
+                .setMessage(R.string.change_to_today)
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mEvent.setPlanTime(System.currentTimeMillis());
+                        new UpdateTask(mDb, mHandler).execute(mEvent);
+                        startClock();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+    }
+
+    private void giveUp() {
+        new AlertDialog.Builder(DetailEventActivity.this)
+                .setMessage(R.string.if_give_up)
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mBtnEventName.setEnabled(true);
+                        mBtnPlanTime.setEnabled(true);
+                        mBtnTime.setEnabled(true);
+                        mSpSound.setEnabled(true);
+                        starting = false;
+                        mAlarmManager.cancel(pIntent);
+                        mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
+                        mHandler.removeMessages(MSG_UPDATE_TIME);
+                        mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_start: {
+                if (!starting) {
+                    if (mEvent.getTime() == 0) {
+                        Toast.makeText(DetailEventActivity.this, R.string.not_set_time, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (!AppUtil.isSameDay(mEvent.getPlanTime(), System.currentTimeMillis())) {
+                        switchToToday();
+                    } else {
+                        startClock();
+                    }
+                } else {
+                    giveUp();
+                }
+                break;
+            }
+            case R.id.btnChangeName: {
+                mAddDialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
+                    @Override
+                    public void onDialogPositiveClick(AddDialogFragment dialog) {
+                        String content = dialog.getContent();
+                        mEvent.setEventName(content);
+                        new UpdateTask(mDb, mHandler).execute(mEvent);
+                    }
+
+                    @Override
+                    public void onDialogNegativeClick(AddDialogFragment dialog) {
+                    }
+                }, View.INVISIBLE);
+                mAddDialog.setContent(mEvent.getEventName());
+                mAddDialog.show(getSupportFragmentManager(), TAG);
+                break;
+            }
+            case R.id.btnChangeDate: {
+                Calendar calendar = Calendar.getInstance();
+                final DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(DetailEventActivity.this,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show(getFragmentManager(), TAG);
+                break;
+            }
+            case R.id.btnChangeTime: {
+                TimePickerDialog dialog = new TimePickerDialog();
+                dialog.initialize(new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+                        if (mEvent.getTime() != minute) {
+                            mEvent.setTime(minute);
+                            new UpdateTask(mDb, mHandler).execute(mEvent);
+                        }
+                    }
+                }, 1, 0, true);
+                dialog.show(getFragmentManager(), "tag");
+                break;
+            }
+        }
 
     }
 
@@ -219,115 +326,18 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
         mTvEndInfo = (TextView) findViewById(R.id.end_msg);
 
         mBtnStartEvent = (ImageView) findViewById(R.id.btn_start);
-        mBtnStartEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!starting) {
-                    if (mEvent.getTime() == 0) {
-                        Toast.makeText(DetailEventActivity.this, R.string.not_set_time, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    if (!AppUtil.isSameDay(mEvent.getPlanTime(), System.currentTimeMillis())) {
-                        new AlertDialog.Builder(DetailEventActivity.this)
-                                .setMessage(R.string.change_to_today)
-                                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        mEvent.setPlanTime(System.currentTimeMillis());
-                                        new UpdateTask(mDb, mHandler).execute(mEvent);
-                                        startClock();
-                                    }
-                                })
-                                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                })
-                                .create().show();
-                    } else {
-                        startClock();
-                    }
-                } else {
-                    new AlertDialog.Builder(DetailEventActivity.this)
-                            .setMessage(R.string.if_give_up)
-                            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mBtnEventName.setEnabled(true);
-                                    mBtnPlanTime.setEnabled(true);
-                                    mBtnTime.setEnabled(true);
-                                    mSpSound.setEnabled(true);
-                                    starting = false;
-                                    mAlarmManager.cancel(pIntent);
-                                    mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
-                                    mHandler.removeMessages(MSG_UPDATE_TIME);
-                                    mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .create().show();
-                }
-
-            }
-        });
+        mBtnStartEvent.setOnClickListener(this);
         mTvEventName = (TextView) findViewById(R.id.tv_event_name);
         mBtnEventName = (ImageButton) findViewById(R.id.btnChangeName);
-        mBtnEventName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAddDialog = new AddDialogFragment(getString(R.string.add_today_event), new AddDialogFragment.AddDialogListener() {
-                    @Override
-                    public void onDialogPositiveClick(AddDialogFragment dialog) {
-                        String content = dialog.getContent();
-                        mEvent.setEventName(content);
-                        new UpdateTask(mDb, mHandler).execute(mEvent);
-                    }
-
-                    @Override
-                    public void onDialogNegativeClick(AddDialogFragment dialog) {
-                    }
-                }, View.INVISIBLE);
-                mAddDialog.setContent(mEvent.getEventName());
-                mAddDialog.show(getSupportFragmentManager(), TAG);
-            }
-        });
+        mBtnEventName.setOnClickListener(this);
         mTvRealTime = (TextView) findViewById(R.id.real_time);
         mTvPlanTime = (TextView) findViewById(R.id.plan_time);
         mBtnPlanTime = (ImageButton) findViewById(R.id.btnChangeDate);
-        mBtnPlanTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                final DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(DetailEventActivity.this,
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show(getFragmentManager(), TAG);
-            }
-        });
+        mBtnPlanTime.setOnClickListener(this);
 
         mTvTime = (TextView) findViewById(R.id.time);
         mBtnTime = (ImageButton) findViewById(R.id.btnChangeTime);
-        mBtnTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog dialog = new TimePickerDialog();
-                dialog.initialize(new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-                        if (mEvent.getTime() != minute) {
-                            mEvent.setTime(minute);
-                            new UpdateTask(mDb, mHandler).execute(mEvent);
-                        }
-                    }
-                }, 1, 0, true);
-                dialog.show(getFragmentManager(), "tag");
-            }
-        });
+        mBtnTime.setOnClickListener(this);
 
         mSpSound = (Spinner) findViewById(R.id.sound_picker);
         mSoundAdapter = new ArrayAdapter<String>(this, R.layout.sound_spinner_item, AppUtil.SOUND_TITLE);
@@ -362,28 +372,9 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            if (starting) {
-                new AlertDialog.Builder(this)
-                        .setMessage(R.string.if_give_up)
-                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                starting = false;
-                                mAlarmManager.cancel(pIntent);
-                                mBtnStartEvent.setImageResource(android.R.drawable.ic_media_play);
-                                mHandler.removeMessages(MSG_UPDATE_TIME);
-                                mHandler.sendEmptyMessage(MSG_UPDATE_EVENT);
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .create().show();
-                return true;
-            }
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 && starting) {
+            giveUp();
+            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
