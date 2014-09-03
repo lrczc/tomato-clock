@@ -100,7 +100,7 @@ public class MainActivity extends FragmentActivity {
         PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, broadcastIntent, 0);
         Calendar calendar = Calendar.getInstance();
         //calendar.add(Calendar.SECOND, 10);
-        if (calendar.get(Calendar.HOUR) > AppUtil.ALERT_HOUR) {
+        if (calendar.get(Calendar.HOUR) >= AppUtil.ALERT_HOUR) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         calendar.set(Calendar.HOUR, AppUtil.ALERT_HOUR);
