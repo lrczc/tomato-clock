@@ -21,7 +21,7 @@ public class MyPageTransformer implements ViewPager.PageTransformer {
 
         } else if (position <= 0) { // [-1,0]
             // Use the default slide transition when moving to the left page
-            view.setAlpha(1);
+            view.setAlpha(scaleFactor);
             //view.setTranslationX(0);
 //            view.setPivotX(0.5f*pageWidth);
 //            view.setPivotY(0.5f*pageHeight);
@@ -38,7 +38,7 @@ public class MyPageTransformer implements ViewPager.PageTransformer {
             //view.setTranslationX(pageWidth * -position);
 
             // Scale the page down (between MIN_SCALE and 1)
-            view.setAlpha(1);
+            view.setAlpha(scaleFactor);
             //view.setTranslationX(0);
 //            view.setPivotX(0.5f*pageWidth);
 //            view.setPivotY(0.5f*pageHeight);

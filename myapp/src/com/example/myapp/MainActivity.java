@@ -115,6 +115,7 @@ public class MainActivity extends FragmentActivity {
         //mAlarmManager.cancel(pIntent);
         mViewPager.setPageTransformer(true, new MyPageTransformer());
 
+
         mOpenHelper = new TomatoOpenHelper(getApplicationContext());
 
 //        mRG = (RadioGroup) findViewById(R.id.tabs_rg);
