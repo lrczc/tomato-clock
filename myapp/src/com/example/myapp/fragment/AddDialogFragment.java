@@ -87,6 +87,7 @@ public class AddDialogFragment extends DialogFragment implements DatePickerDialo
             @Override
             public void onClick(View v) {
                 Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(mPlanTime);
                 final DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(AddDialogFragment.this,
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),

@@ -208,6 +208,7 @@ public class DetailEventActivity extends FragmentActivity implements IFOnEventFe
             }
             case R.id.btnChangeDate: {
                 Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(mEvent.getPlanTime());
                 final DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(DetailEventActivity.this,
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
