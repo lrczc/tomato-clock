@@ -113,7 +113,7 @@ public class MainActivity extends FragmentActivity {
         calendar.set(Calendar.MINUTE, 0);
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AppUtil.REPEAT_INTERVAL, pIntent);
         //mAlarmManager.cancel(pIntent);
-        //mViewPager.setPageTransformer(true, new DepthPageTransformer());
+        mViewPager.setPageTransformer(true, new MyPageTransformer());
 
         mOpenHelper = new TomatoOpenHelper(getApplicationContext());
 
