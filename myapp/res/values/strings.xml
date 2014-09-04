@@ -39,4 +39,5 @@
     <string name="initial_real_time">00:00:000</string>
     <string name="alert_title">番茄钟提醒</string>
     <string name="alert_message">今日有任务，请及时完成。</string>
+    <string name="today_blank_info">今日暂无任务~~</string>
 </resources>

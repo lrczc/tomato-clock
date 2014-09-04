@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:orientation="vertical">
+    <TextView
+        android:padding="20dp"
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/blank_info"
+        android:text="@string/today_blank_info"
+        android:layout_gravity="center_horizontal"
+        />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,4 +21,4 @@
         android:dividerHeight="2px"
         android:id="@+id/event_list"></ListView>
 
-</LinearLayout>  
+</FrameLayout>

@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapp.AppUtil;
 import com.example.myapp.DetailEventActivity;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
@@ -23,6 +26,7 @@ import com.example.myapp.database.Database;
 import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.model.Event;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,8 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
 
     private String TAG = "today event";
 
+    private TextView mTvBlankInfo;
+
     private Context mContext;
 
     private ListView mLvEventList;
@@ -45,6 +51,27 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
     private AddDialogFragment dialog;
 
     private Database mDb;
+
+    public static final int MSG_FETCH_EVENTS = 0x01;
+
+    public static final int MSG_NOT_FETCH_EVENTS = 0x02;
+
+    TodayHandler mHandler;
+
+    class TodayHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_FETCH_EVENTS:
+                    mTvBlankInfo.setVisibility(View.INVISIBLE);
+                    break;
+                case MSG_NOT_FETCH_EVENTS:
+                    mTvBlankInfo.setVisibility(View.VISIBLE);
+                    break;
+            }
+        }
+    }
 
     public TodayFragment(Context context) {
         mContext = context;
@@ -57,6 +84,7 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
         TomatoOpenHelper openHelper = ((MainActivity) getActivity()).getOpenHelper();
         mDb = new Database(openHelper);
         mEventAdapter = new EventListAdapter(getLayoutInflater(savedInstanceState));
+        mHandler = new TodayHandler();
     }
 
     @Override
@@ -87,13 +115,14 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
     }
 
     private void loadlist() {
-        LoadTask mLoadTask = new LoadTask(mDb, EVENT_COUNT, mEventAdapter);
+        LoadTask mLoadTask = new LoadTask(mDb, EVENT_COUNT, mEventAdapter, mHandler);
         mLoadTask.execute();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.today_fragment_layout, container, false);
+        mTvBlankInfo = (TextView) view.findViewById(R.id.blank_info);
         mLvEventList = (ListView) view.findViewById(R.id.event_list);
         mLvEventList.setVisibility(View.VISIBLE);
         mLvEventList.setAdapter(mEventAdapter);
@@ -113,6 +142,8 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
                     public void onClick(DialogInterface dialog, int which) {
                         new DeleteEventTask(mDb).execute(mEventAdapter.getItem(position));
                         mEventAdapter.deleteEvent(position);
+                        if (mEventAdapter.getCount() == 0)
+                            mHandler.sendEmptyMessage(MSG_NOT_FETCH_EVENTS);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -144,9 +175,12 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
                 long planTime = dialog.getPlanTime();
                 if (content != null && content.length() != 0) {
                     event = new Event(dialog.getContent(), planTime);
-                    mEventAdapter.addEventLast(event);
                     new AddEventTask(mDb).execute(event);
                     Toast.makeText(getActivity(), R.string.add_success, Toast.LENGTH_SHORT).show();
+                    if (AppUtil.isSameDay(planTime, System.currentTimeMillis())) {
+                        mEventAdapter.addEventLast(event);
+                        mHandler.sendEmptyMessage(MSG_FETCH_EVENTS);
+                    } else ((MainActivity) getActivity()).switchTo(MainActivity.PLAN);
                 } else {
                     Toast.makeText(getActivity(), R.string.error_empty_name, Toast.LENGTH_SHORT).show();
                     return;
@@ -165,11 +199,13 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
         private Database mDb;
         private String count;
         private EventListAdapter mEventAdapter;
+        private TodayHandler mHandler;
 
-        LoadTask(Database mDb, String count, EventListAdapter mEventAdapter) {
+        LoadTask(Database mDb, String count, EventListAdapter mEventAdapter, TodayHandler mHandler) {
             this.mDb = mDb;
             this.count = count;
             this.mEventAdapter = mEventAdapter;
+            this.mHandler = mHandler;
         }
 
         @Override
@@ -180,6 +216,9 @@ public class TodayFragment extends BaseFragment implements ListView.OnItemLongCl
         @Override
         protected void onPostExecute(List<Event> events) {
             super.onPostExecute(events);
+            if (events.size() == 0) {
+                mHandler.sendEmptyMessage(MSG_NOT_FETCH_EVENTS);
+            } else mHandler.sendEmptyMessage(MSG_FETCH_EVENTS);
             mEventAdapter.changeEvents(events);
         }
     }

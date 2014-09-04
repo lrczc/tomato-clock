@@ -32,6 +32,8 @@ import mirko.android.datetimepicker.time.TimePickerDialog;
 
 public class MainActivity extends FragmentActivity {
 
+    public static final int TODAY = 0, PLAN = 1, RECORD = 2;
+
     private TabBarView tabBarView;
 
     SectionsPagerAdapter mSectionsPagerAdapter;
@@ -49,6 +51,10 @@ public class MainActivity extends FragmentActivity {
 
     public TomatoOpenHelper getOpenHelper() {
         return mOpenHelper;
+    }
+
+    public void switchTo(int dest) {
+        mViewPager.setCurrentItem(dest, true);
     }
 
     @Override
