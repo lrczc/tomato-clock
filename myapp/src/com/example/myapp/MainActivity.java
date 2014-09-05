@@ -1,9 +1,11 @@
 package com.example.myapp;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -13,7 +15,11 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.fragment.BaseFragment;
@@ -21,22 +27,28 @@ import com.example.myapp.fragment.PlanFragment;
 import com.example.myapp.fragment.RecordFragment;
 import com.example.myapp.fragment.TodayFragment;
 import com.mirko.tbv.TabBarView;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import mirko.android.datetimepicker.time.RadialPickerLayout;
-import mirko.android.datetimepicker.time.TimePickerDialog;
-
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
     public static final int TODAY = 0, PLAN = 1, RECORD = 2;
+
+    View btn1, btn2, btn3;
 
     private TabBarView tabBarView;
 
     SectionsPagerAdapter mSectionsPagerAdapter;
+
+    FloatingActionButton rightLowerButton;
+
+    FloatingActionMenu rightLowerMenu;
 
     //    private RadioGroup mRG;
     private List<BaseFragment> mFragments = new ArrayList<BaseFragment>();
@@ -55,28 +67,6 @@ public class MainActivity extends FragmentActivity {
 
     public void switchTo(int dest) {
         mViewPager.setCurrentItem(dest, true);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.today_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_add:
-                mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem()).actionAddEvent();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -115,8 +105,41 @@ public class MainActivity extends FragmentActivity {
         //mAlarmManager.cancel(pIntent);
         mViewPager.setPageTransformer(true, new MyPageTransformer());
 
-
         mOpenHelper = new TomatoOpenHelper(getApplicationContext());
+
+        ImageView fabIconNew = new ImageView(this);
+        fabIconNew.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_menu));
+        rightLowerButton = new FloatingActionButton.Builder(this)
+                .setContentView(fabIconNew)
+                .build();
+
+        SubActionButton.Builder rLSubBuilder = new SubActionButton.Builder(this);
+        ImageView rlIcon1 = new ImageView(this);
+        ImageView rlIcon2 = new ImageView(this);
+        ImageView rlIcon3 = new ImageView(this);
+
+        rlIcon1.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_add));
+        rlIcon2.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_delete));
+        rlIcon3.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_menu_preferences));
+
+        btn1 = rLSubBuilder.setContentView(rlIcon1).build();
+        btn2 = rLSubBuilder.setContentView(rlIcon2).build();
+        btn3 = rLSubBuilder.setContentView(rlIcon3).build();
+
+        btn1.setTag(MenuType.ADD);
+        btn2.setTag(MenuType.CLEAR_OLD);
+        btn3.setTag(MenuType.SETTING);
+
+        btn1.setOnClickListener(this);
+        btn2.setOnClickListener(this);
+        btn3.setOnClickListener(this);
+
+        rightLowerMenu = new FloatingActionMenu.Builder(this)
+                .addSubActionView(btn1)
+                .addSubActionView(btn2)
+                .addSubActionView(btn3)
+                .attachTo(rightLowerButton)
+                .build();
 
 //        mRG = (RadioGroup) findViewById(R.id.tabs_rg);
 //        mTabAdapter = new FragmentTabAdapter(this, mFragments, R.id.tab_content, mRG);
@@ -127,6 +150,38 @@ public class MainActivity extends FragmentActivity {
 //            }
 //        });
     }
+
+    @Override
+    public void onClick(View v) {
+        switch ((MenuType) v.getTag()) {
+            case ADD:
+                mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem()).actionAddEvent();
+                rightLowerMenu.close(true);
+                break;
+            case CLEAR_OLD:
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.if_delete_old)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ((PlanFragment) mSectionsPagerAdapter.getItem(PLAN)).clearOldEvent();
+                                Toast.makeText(MainActivity.this, R.string.delete_success, Toast.LENGTH_SHORT).show();
+                                rightLowerMenu.close(true);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .create().show();
+                break;
+            case SETTING:
+                rightLowerMenu.close(true);
+                break;
+        }
+    }
+
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter implements TabBarView.IconTabProvider {
         private List<BaseFragment> fragments;

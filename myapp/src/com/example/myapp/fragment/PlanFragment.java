@@ -164,6 +164,11 @@ public class PlanFragment extends BaseFragment implements AdapterView.OnItemClic
         addItem();
     }
 
+    public void clearOldEvent() {
+        new DeleteOldEventTask(mDb).execute();
+        new LoadTask(mDb, COUNT, adapter, inflater).execute();
+    }
+
     static class LoadTask extends AsyncTask<Void, Void, List<Event>> {
 
         private Database mDb;
@@ -237,6 +242,20 @@ public class PlanFragment extends BaseFragment implements AdapterView.OnItemClic
             for (int i=0; i<count; i++) {
                 mDb.deleteEvent(params[i]);
             }
+            return null;
+        }
+    }
+
+    static class DeleteOldEventTask extends AsyncTask<Void, Void, Void> {
+        private Database mDb;
+
+        DeleteOldEventTask(Database mDb) {
+            this.mDb = mDb;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mDb.clearOldEvent();
             return null;
         }
     }

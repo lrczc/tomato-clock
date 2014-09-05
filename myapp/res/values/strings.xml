@@ -31,6 +31,8 @@
     <string name="add_today_event">添加今日事件</string>
     <string name="add_event">添加事件</string>
     <string name="edit_name">编辑名称</string>
+    <string name="if_delete_old">是否确定删除今天之前的事件？</string>
+    <string name="delete_success">删除成功</string>
     <string name="delete_confirm">确认删除</string>
     <string name="if_delete">是否删除？</string>
     <string name="comment">评论</string>

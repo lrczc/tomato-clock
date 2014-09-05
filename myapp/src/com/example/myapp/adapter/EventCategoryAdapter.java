@@ -43,6 +43,10 @@ public class EventCategoryAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void deleteCategoryFirst() {
+        categories.remove(0);
+    }
+
     public void deleteEvent(int position){
         for (EventCategory category : categories) {
             int size = category.getAdapter().getCount() + 1;
@@ -72,6 +76,19 @@ public class EventCategoryAdapter extends BaseAdapter {
         adapter.addEventLast(event);
         categories.add(pointer,new EventCategory(AppUtil.timeToString1(event.getPlanTime(),dateFormat), adapter));
         notifyDataSetChanged();
+    }
+
+    public List<Event> getAndDeleteOldEvent() {
+        List<Event> events = new ArrayList<Event>();
+        long today = System.currentTimeMillis();
+        int pointer = 0;
+        for (; pointer<categories.size(); pointer++) {
+            if (!categories.get(pointer).getTitle().equals(AppUtil.timeToString1(today, dateFormat))) {
+                events.addAll(categories.get(pointer).getAdapter().getEventList());
+            } else break;
+        }
+        for (int i=0; i<pointer-1; i++) deleteCategoryFirst();
+        return events;
     }
 
     public boolean isTitle(int position) {

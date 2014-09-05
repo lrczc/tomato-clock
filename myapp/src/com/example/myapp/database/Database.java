@@ -39,6 +39,18 @@ public class Database {
         return false;
     }
 
+    public void clearOldEvent() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        String whereClause = EventColumns.PLAN_TIME + "<?";
+        String[] whereArgs = {String.valueOf(calendar.getTimeInMillis())};
+        SQLiteDatabase db = getWritable();
+        db.delete(EventColumns.class.getSimpleName(), whereClause, whereArgs);
+    }
+
     public Event getEvent(long id) {
         String[] eventColumns = new String[] {
                 EventColumns._ID, EventColumns.EVENT_NAME, EventColumns.TIME, EventColumns.SOUND, EventColumns.PLAN_TIME, EventColumns.CREATE_TIME
