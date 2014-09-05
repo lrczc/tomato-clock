@@ -1,7 +1,6 @@
 package com.example.myapp;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -11,13 +10,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -26,6 +20,7 @@ import com.example.myapp.fragment.BaseFragment;
 import com.example.myapp.fragment.PlanFragment;
 import com.example.myapp.fragment.RecordFragment;
 import com.example.myapp.fragment.TodayFragment;
+import com.mirko.tbv.MyViewPager;
 import com.mirko.tbv.TabBarView;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
@@ -57,7 +52,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private TomatoOpenHelper mOpenHelper;
 
-    private ViewPager mViewPager;
+    private MyViewPager mViewPager;
 
     private AlarmManager mAlarmManager;
 
@@ -83,7 +78,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         View v = inflator.inflate(R.layout.custom_ab, null);
         tabBarView = (TabBarView) v.findViewById(R.id.tab_bar);
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (MyViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         tabBarView.setViewPager(mViewPager);
 

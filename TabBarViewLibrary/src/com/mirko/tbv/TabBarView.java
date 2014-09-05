@@ -25,7 +25,7 @@ public class TabBarView extends LinearLayout {
 	private int mStripHeight;
 	private float mOffset = 0f;
 	public static int mSelectedTab = 0;
-	public ViewPager pager;
+	public MyViewPager pager;
 
 	public static int tabCount;
 	private final PageListener pageListener = new PageListener();
@@ -114,7 +114,7 @@ public class TabBarView extends LinearLayout {
 		}
 	}
 
-	public void setViewPager(ViewPager pager) {
+	public void setViewPager(MyViewPager pager) {
 		this.pager = pager;
 
 		if (pager.getAdapter() == null) {
@@ -126,7 +126,7 @@ public class TabBarView extends LinearLayout {
 		notifyDataSetChanged();
 	}
 	
-	private class PageListener implements OnPageChangeListener {
+	private class PageListener implements MyViewPager.OnPageChangeListener {
 
 		@Override
 		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

@@ -1,12 +1,13 @@
 package com.example.myapp;
 
-import android.support.v4.view.ViewPager;
 import android.view.View;
+
+import com.mirko.tbv.MyViewPager;
 
 /**
  * Created by shizhao.czc on 2014/9/4.
  */
-public class MyPageTransformer implements ViewPager.PageTransformer {
+public class MyPageTransformer implements MyViewPager.PageTransformer {
     private static final float MIN_SCALE = 0.6f;
 
     private static final float ROTATION_ANGLE = 60;
