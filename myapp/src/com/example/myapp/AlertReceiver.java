@@ -32,7 +32,7 @@ public class AlertReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent1, 0);
 
             Notification notification = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setSmallIcon(R.drawable.icon)
                     .setTicker(context.getString(R.string.alert_title))
                     .setContentInfo(context.getString(R.string.alert_message))
                     .setContentTitle(context.getString(R.string.alert_title))

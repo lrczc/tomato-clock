@@ -12,6 +12,7 @@
         android:id="@+id/blank_info"
         android:text="@string/today_blank_info"
         android:layout_gravity="center_horizontal"
+        android:visibility="invisible"
         />
     <ListView
         android:layout_width="match_parent"
