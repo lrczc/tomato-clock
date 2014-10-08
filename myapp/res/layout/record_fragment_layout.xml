@@ -5,15 +5,32 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <com.db.chart.view.LineChartView
+        xmlns:chart="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/linechart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        chart:chart_shadowDy="1dp"
+        chart:chart_shadowRadius="1dp"
+        chart:chart_shadowColor="#80000000"
+        chart:chart_axisColor="@color/axis"
+        chart:chart_axisBorderSpacing="0dp"
+        />
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:id="@+id/event_list"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:divider="@android:color/darker_gray"
-        android:dividerHeight="1px" />
+        android:dividerHeight="1px"/>
 
 </LinearLayout>

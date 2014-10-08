@@ -11,4 +11,6 @@
     <color name="actionbar_text">#ffffffff</color>
     <color name="title_background">#ffbababa</color>
     <color name="add_button_background">#ffdbdbdb</color>
+    <color name="axis">#37474f</color>
+    <color name="grid">#b0bec5</color>
 </resources>

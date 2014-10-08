@@ -34,4 +34,16 @@ public class AppUtil {
     public static boolean isSameDay(long time1, long time2) {
        return (time1/DAY_TIME == time2/DAY_TIME);
     }
+
+    public static String nextDay(String day, SimpleDateFormat dateFormat) {
+        return timeToString1(stringToTime(day, dateFormat) + DAY_TIME, dateFormat);
+    }
+
+    public static long nextDay(long day) {
+        return day + DAY_TIME;
+    }
+
+    public static long lastDay(long day) {
+        return day - DAY_TIME;
+    }
 }

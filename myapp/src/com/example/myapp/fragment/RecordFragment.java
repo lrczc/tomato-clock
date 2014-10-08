@@ -4,9 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.db.chart.Tools;
+import com.db.chart.listener.OnEntryClickListener;
+import com.db.chart.model.LineSet;
+import com.db.chart.model.Point;
+import com.db.chart.view.LineChartView;
+import com.db.chart.view.animation.Animation;
+import com.db.chart.view.animation.easing.bounce.BounceEaseOut;
+import com.db.chart.view.animation.easing.elastic.ElasticEaseOut;
+import com.db.chart.view.animation.easing.quint.QuintEaseOut;
+import com.example.myapp.AppUtil;
 import com.example.myapp.DetailRecordEventActivity;
 import com.example.myapp.MainActivity;
 import com.example.myapp.R;
@@ -23,6 +37,8 @@ import com.example.myapp.database.TomatoOpenHelper;
 import com.example.myapp.model.Event;
 import com.example.myapp.model.RecordEvent;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,14 +46,25 @@ import java.util.List;
  */
 public class RecordFragment extends BaseFragment implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
+    private static final int nSets = 1;
+    private static final int nPoints = 8;
+    private String[] labals = new String[nPoints];
+    private int[] values = new int[nPoints];
+
     private Context mContext;
 
     private ListView mLvRecordEventList;
 
     private RecordEventListAdapter mEventAdapter;
 
+    private LineChartView mLineChartView;
+
     private Database mDb;
     private String TAG = "record fragment";
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    private SimpleDateFormat dateFormat2 = new SimpleDateFormat("MM-dd");
 
     public RecordFragment(Context context) {
         mContext = context;
@@ -85,6 +112,7 @@ public class RecordFragment extends BaseFragment implements AdapterView.OnItemLo
         mLvRecordEventList.setAdapter(mEventAdapter);
         mLvRecordEventList.setOnItemLongClickListener(this);
         mLvRecordEventList.setOnItemClickListener(this);
+        mLineChartView = (LineChartView) view.findViewById(R.id.linechart);
         return view;
     }
 
@@ -141,12 +169,21 @@ public class RecordFragment extends BaseFragment implements AdapterView.OnItemLo
         }, View.VISIBLE).show(getFragmentManager(), TAG);
     }
 
+    private static Paint getPaint() {
+        Paint paint = new Paint();
+        paint.setColor(Color.parseColor("#b0bec5"));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(Tools.fromDpToPx(1));
+        //paint.setPathEffect(new DashPathEffect(new float[] {10,10}, 0));
+        return paint;
+    }
     @Override
     public void actionAddEvent() {
         addItem();
     }
 
-    static class LoadTask extends AsyncTask<Void, Void, List<RecordEvent>> {
+    class LoadTask extends AsyncTask<Void, Void, List<RecordEvent>> {
 
         private Database mDb;
         private RecordEventListAdapter mEventAdapter;
@@ -165,7 +202,91 @@ public class RecordFragment extends BaseFragment implements AdapterView.OnItemLo
         protected void onPostExecute(List<RecordEvent> events) {
             super.onPostExecute(events);
             mEventAdapter.changeEvents(events);
+            //updateLineChart(events);
+            new UpdateLineTask().execute(events);
         }
+    }
+    class UpdateLineTask extends AsyncTask<List<RecordEvent>, Void, List<LineSet>> {
+
+        UpdateLineTask() {
+        }
+
+        @Override
+        protected List<LineSet> doInBackground(List<RecordEvent>... params) {
+            List<LineSet> lineSets = new ArrayList<LineSet>();
+            List<RecordEvent> events = params[0];
+            long day = System.currentTimeMillis();
+
+            int curPoint = 0;
+            labals[curPoint] = AppUtil.timeToString1(day, dateFormat2);
+            values[curPoint] = 0;
+            boolean flag = false;
+            for (RecordEvent event : events) {
+                while (!AppUtil.isSameDay(event.getCompleteTime(), day)) {
+                    curPoint++;
+                    if (curPoint == nPoints) {
+                        flag = true;
+                        break;
+                    }
+                    day = AppUtil.lastDay(day);
+                    labals[curPoint] = AppUtil.timeToString1(day, dateFormat2);
+                    values[curPoint] = 0;
+                }
+                if (flag) {
+                    break;
+                }
+                values[curPoint]++;
+            }
+            if (curPoint < nPoints) {
+                for (; curPoint < nPoints; curPoint++) {
+                    day = AppUtil.lastDay(day);
+                    labals[curPoint] = AppUtil.timeToString1(day, dateFormat2);
+                    values[curPoint] = 0;
+                }
+            }
+
+            for(int i = 0; i < nSets; i++) {
+
+                LineSet data = new LineSet();
+                for(int j = nPoints - 1; j >= 0; j--)
+                    data.addPoint(new Point(labals[j], values[j]));
+
+                data.setDots(true)
+                        .setDotsColor(Color.parseColor("#f36c60"))
+                        .setDotsRadius(4)
+                        .setLineThickness(3)
+                        .setLineColor(Color.parseColor("#7986cb"))
+                        .setFill(true)
+                        .setFillColor(Color.parseColor("#3388c6c3"))
+                        .setDashed(true)
+                        .setSmooth(true);
+//            if(randBoolean())
+//                data.setDotsStrokeThickness(randDimen(1,4))
+//                        .setDotsStrokeColor(Color.parseColor(getColor(randNumber(0,2))));
+
+                lineSets.add(data);
+            }
+            return lineSets;
+        }
+
+        @Override
+        protected void onPostExecute(List<LineSet> lineSets) {
+            super.onPostExecute(lineSets);
+            mLineChartView.reset();
+            for (LineSet lineSet : lineSets) {
+                mLineChartView.addData(lineSet);
+            }
+            mLineChartView.setGrid(getPaint())
+                    .setMaxAxisValue(10, 2)
+                            //.setVerticalGrid(randPaint())
+                            //.setHorizontalGrid(getPaint())
+                            //.setThresholdLine(2, randPaint())
+                    .setLabels(true)
+                    //.animate(new Animation().setEasing(new QuintEaseOut()))
+            .show()
+            ;
+        }
+
     }
 
     static class DeleteEventTask extends AsyncTask<RecordEvent, Void, Void> {
